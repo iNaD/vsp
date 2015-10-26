@@ -1,21 +1,169 @@
 #%RAML 0.8
 
 title: Monopoly API
-baseUri: http://localhost:4567/{version}
 version: v1
+baseUri: http://localhost:4567/{version}
+
+schemas:
+    - dice: |
+        {
+            "type": "object",
+            "properties": {
+                "number": {
+                    "type": "int",
+                    "required": true
+                }
+            }
+        }
+    - player: |
+        {
+            "type": "object",
+            "required": true,
+            "properties": {
+                "id": {
+                    "type": "number",
+                    "required": true
+                }
+            }
+        }
+    - game: |
+        {
+            "type": "object",
+            "required": true,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "required": true
+                },
+                "round": {
+                    "type": "number",
+                    "required": true
+                }
+            }
+        }
 
 /dice:
+    description: "Enables dice interaction."
     get:
-        description: Gives you a single dice roll
+        description: "Gives you a single dice roll."
         responses:
             200:
                 body:
                     application/json:
-                        schema: |
-                                {   "type": "object",
-                                    "properties": {
-                                        "number": {"type": "int"},
-                                        "required": true
-                                    },
-                                }
+                        schema: dice
                         example: '{ "number": 4 }'
+
+
+/games:
+    description: "Manages Games"
+    get:
+        description: "Returns a list of available games."
+        queryParameters:
+            player:
+                displayName: Player
+                type: number
+                description: Filter for games with the given player id
+                example: 12345
+                required: false
+            round:
+                displayName: Round
+                type: number
+                description: Filter for games with the given round
+                example: 42
+                required: false
+        responses:
+            200:
+                body:
+                    application/json:
+                        schema: game
+                        example: |
+                            [
+                                {
+                                    "name": "foo", "round": 0
+                                },
+                                {
+                                    "name": "bar", "round": 4
+                                },
+                            ]
+    post:
+        description: "Creates a new game."
+        body:
+            application/json:
+                schema: game
+                example: |
+                    {
+                        "name": "foo",
+                        "round": 1
+                    }
+        responses:
+            201:
+                body:
+                    application/json:
+                        schema: game
+                        example: |
+                            {
+                                "name": "foo",
+                                "round": 1
+                            }
+            400:
+                body:
+                    application/json:
+                        example: |
+                            {
+                                "error": "Invalid body content"
+                            }
+    /{game}:
+        description: "A single game."
+        get:
+            description: "Returns game details."
+            responses:
+                200:
+                    description: "Will be returned if the game exists."
+                    body:
+                        application/json:
+                            schema: game
+                            example: |
+                                {
+                                    "name": "foo",
+                                    "round": 4
+                                }
+                404:
+                    description: "Will be returned if the game doesn't exist."
+                    body:
+                        application/json:
+                            example: |
+                                {
+                                    "error": "Unknown game"
+                                }
+        put:
+            description: "Updates the game."
+            body:
+                application/json:
+                    schema: game
+                    example: |
+                        {
+                            "name": "foo",
+                            "round": 4
+                        }
+            responses:
+                200:
+                    body:
+                        application/json:
+                            schema: game
+        delete:
+            description: "Deletes the game."
+            responses:
+                200:
+                    body:
+                        application/json:
+                            example: |
+                                {
+                                    "game": 1
+                                    "deleted": true
+                                }
+        /{players}:
+            description: "Players belonging to the game."
+            get:
+                description: "Returns a list of players playing this game."
+            post:
+                description: "Adds a new player to the game."
