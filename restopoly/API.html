@@ -150,31 +150,43 @@
     }
 }
 </code></pre><p><strong>Example</strong>:</p><pre><code>{ "number": 4 }</code></pre></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="games" class="panel-title">/games</h3></div><div class="panel-body"><div class="top-resource-description"><p>Manages Games</p></div><div class="panel-group"><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_games"><span class="parent"></span>/games</a> <span class="methods"><a href="#games_get"><span class="badge badge_get">get</span></a> <a href="#games_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_games" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#games_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Returns a list of available games.</p></div><div class="clearfix"></div></div><div onclick="window.location.href = '#games_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Creates a new game.</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="games_get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent"></span>/games</h4></div><div class="modal-body"><div class="alert alert-info"><p>Returns a list of available games.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#games_get_request" data-toggle="tab">Request</a></li><li><a href="#games_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="games_get_request"><h3>Query Parameters</h3><ul><li><strong>Player</strong>: <em>(number)</em><p>Filter for games with the given player id</p><p><strong>Example</strong>:</p><pre><code>12345</code></pre></li><li><strong>Round</strong>: <em>(number)</em><p>Filter for games with the given round</p><p><strong>Example</strong>:</p><pre><code>42</code></pre></li></ul></div><div class="tab-pane" id="games_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><h3>Body</h3><p><strong>Type: application/json</strong></p><p><strong>Schema</strong>:</p><pre><code>{
-    "type": "object",
-    "required": true,
-    "properties": {
-        "name": {
-            "type": "string",
-            "required": true
-        },
-        "round": {
-            "type": "number",
-            "required": true
-        }
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-03/schema",
+  "id": "http://jsonschema.net",
+  "required": true,
+  "properties": {"games":
+     {
+      "type": "array",
+      "$schema": "http://json-schema.org/draft-03/schema",
+      "id": "http://jsonschema.net",
+      "required": true,
+      "items": {"$ref": "game" }
     }
+ }
 }
-</code></pre><p><strong>Example</strong>:</p><pre><code>[
-    {
-        "name": "foo", "round": 0
-    },
-    {
-        "name": "bar", "round": 4
-    },
-]
+</code></pre><p><strong>Example</strong>:</p><pre><code>{
+    games: [
+        {
+            "id": 1,
+            "name": "foo",
+            "round": 0,
+            "players": [
+                {
+                    "id": 43,
+                    "name": "Hans"
+                }
+            ]
+        }
+    ]
+}
 </code></pre></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="games_post"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent"></span>/games</h4></div><div class="modal-body"><div class="alert alert-info"><p>Creates a new game.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#games_post_request" data-toggle="tab">Request</a></li><li><a href="#games_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="games_post_request"><h3>Body</h3><p><strong>Type: application/json</strong></p><p><strong>Schema</strong>:</p><pre><code>{
     "type": "object",
     "required": true,
     "properties": {
+        "id": {
+            "type": "number",
+            "required": true
+        },
         "name": {
             "type": "string",
             "required": true
@@ -193,6 +205,10 @@
     "type": "object",
     "required": true,
     "properties": {
+        "id": {
+            "type": "number",
+            "required": true
+        },
         "name": {
             "type": "string",
             "required": true
@@ -204,6 +220,7 @@
     }
 }
 </code></pre><p><strong>Example</strong>:</p><pre><code>{
+    "id": 1,
     "name": "foo",
     "round": 1
 }
@@ -214,6 +231,10 @@
     "type": "object",
     "required": true,
     "properties": {
+        "id": {
+            "type": "number",
+            "required": true
+        },
         "name": {
             "type": "string",
             "required": true
@@ -225,6 +246,7 @@
     }
 }
 </code></pre><p><strong>Example</strong>:</p><pre><code>{
+    "id": 1,
     "name": "foo",
     "round": 4
 }
@@ -235,6 +257,10 @@
     "type": "object",
     "required": true,
     "properties": {
+        "id": {
+            "type": "number",
+            "required": true
+        },
         "name": {
             "type": "string",
             "required": true
@@ -246,6 +272,7 @@
     }
 }
 </code></pre><p><strong>Example</strong>:</p><pre><code>{
+    "id": 1,
     "name": "foo",
     "round": 4
 }
@@ -253,6 +280,10 @@
     "type": "object",
     "required": true,
     "properties": {
+        "id": {
+            "type": "number",
+            "required": true
+        },
         "name": {
             "type": "string",
             "required": true
@@ -267,4 +298,25 @@
     "game": 1
     "deleted": true
 }
-</code></pre></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_games__game___players_"><span class="parent">/games/{game}</span>/{players}</a> <span class="methods"><a href="#games__game___players__get"><span class="badge badge_get">get</span></a> <a href="#games__game___players__post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_games__game___players_" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Players belonging to the game.</p></div><div class="list-group"><div onclick="window.location.href = '#games__game___players__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Returns a list of players playing this game.</p></div><div class="clearfix"></div></div><div onclick="window.location.href = '#games__game___players__post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Adds a new player to the game.</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="games__game___players__get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/games/{game}</span>/{players}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Returns a list of players playing this game.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#games__game___players__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="games__game___players__get_request"><h3>URI Parameters</h3><ul><li><strong>game</strong>: <em>required (string)</em></li><li><strong>players</strong>: <em>required (string)</em></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="games__game___players__post"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/games/{game}</span>/{players}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Adds a new player to the game.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#games__game___players__post_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="games__game___players__post_request"><h3>URI Parameters</h3><ul><li><strong>game</strong>: <em>required (string)</em></li><li><strong>players</strong>: <em>required (string)</em></li></ul></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a href="#dice">/dice</a></li><li><a href="#games">/games</a></li></ul></div></div></div></div></body></html>
+</code></pre></div></div></div></div></div></div></div><div class="panel panel-white"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_games__game___players_"><span class="parent">/games/{game}</span>/{players}</a> <span class="methods"><a href="#games__game___players__get"><span class="badge badge_get">get</span></a> <a href="#games__game___players__post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_games__game___players_" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Players belonging to the game.</p></div><div class="list-group"><div onclick="window.location.href = '#games__game___players__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Returns a list of players playing this game.</p></div><div class="clearfix"></div></div><div onclick="window.location.href = '#games__game___players__post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Adds a new player to the game.</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="games__game___players__get"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/games/{game}</span>/{players}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Returns a list of players playing this game.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#games__game___players__get_request" data-toggle="tab">Request</a></li><li><a href="#games__game___players__get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="games__game___players__get_request"><h3>URI Parameters</h3><ul><li><strong>game</strong>: <em>required (string)</em></li><li><strong>players</strong>: <em>required (string)</em></li></ul></div><div class="tab-pane" id="games__game___players__get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><h3>Body</h3><p><strong>Type: application/json</strong></p><p><strong>Schema</strong>:</p><pre><code>{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-03/schema",
+  "id": "http://jsonschema.net",
+  "required": true,
+  "properties": {"players":
+     {
+      "type": "array",
+      "$schema": "http://json-schema.org/draft-03/schema",
+      "id": "http://jsonschema.net",
+      "required": true,
+      "items": {"$ref": "player" }
+    }
+ }
+}
+</code></pre><p><strong>Example</strong>:</p><pre><code>[
+    {
+        "id": 1,
+        "name": "Hans"
+    }
+]
+</code></pre></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="games__game___players__post"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/games/{game}</span>/{players}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Adds a new player to the game.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#games__game___players__post_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="games__game___players__post_request"><h3>URI Parameters</h3><ul><li><strong>game</strong>: <em>required (string)</em></li><li><strong>players</strong>: <em>required (string)</em></li></ul></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a href="#dice">/dice</a></li><li><a href="#games">/games</a></li></ul></div></div></div></div></body></html>

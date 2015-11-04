@@ -23,6 +23,10 @@ schemas:
                 "id": {
                     "type": "number",
                     "required": true
+                },
+                "name": {
+                    "type": "string",
+                    "required": true
                 }
             }
         }
@@ -31,6 +35,10 @@ schemas:
             "type": "object",
             "required": true,
             "properties": {
+                "id": {
+                    "type": "number",
+                    "required": true
+                },
                 "name": {
                     "type": "string",
                     "required": true
@@ -41,6 +49,60 @@ schemas:
                 }
             }
         }
+
+resourceTypes:
+  - list:
+      get:
+        description: List of available <<resourcePathName>>
+        responses:
+          200:
+            body:
+              application/json:
+                schema: |
+                  {
+                    "type": "object",
+                    "$schema": "http://json-schema.org/draft-03/schema",
+                    "id": "http://jsonschema.net",
+                    "required": true,
+                    "properties": {"<<schema|!pluralize>>":
+                       {
+                        "type": "array",
+                        "$schema": "http://json-schema.org/draft-03/schema",
+                        "id": "http://jsonschema.net",
+                        "required": true,
+                        "items": {"$ref": "<<schema>>" }
+                      }
+                   }
+                  }
+
+                example: <<example>>
+  - item:
+      get:
+        description: Gets a <<resourcePathName>>
+        responses:
+          200:
+            body:
+              application/json:
+                schema: <<schema>>
+                example: <<example>>
+      put:
+        description: places a <<resourcePathName>>
+        body:
+          application/json:
+            schema: <<schema>>
+            example: <<example>>
+  - collection:
+      type:
+        list:
+          schema: <<schema>>
+          example: <<getexample>>
+      post:
+        description: creates a new <<resourcePathName>
+        body:
+          application/json:
+            schema: <<schema>>
+            example: <<postexample>>
+
 
 /dice:
     description: "Enables dice interaction."
@@ -55,6 +117,26 @@ schemas:
 
 
 /games:
+    type:
+        collection:
+            schema: "game"
+            "getexample": |
+                {
+                    games: [
+                        {
+                            "id": 1,
+                            "name": "foo",
+                            "round": 0,
+                            "players": [
+                                {
+                                    "id": 43,
+                                    "name": "Hans"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            "postexample": ''
     description: "Manages Games"
     get:
         description: "Returns a list of available games."
@@ -71,20 +153,6 @@ schemas:
                 description: Filter for games with the given round
                 example: 42
                 required: false
-        responses:
-            200:
-                body:
-                    application/json:
-                        schema: game
-                        example: |
-                            [
-                                {
-                                    "name": "foo", "round": 0
-                                },
-                                {
-                                    "name": "bar", "round": 4
-                                },
-                            ]
     post:
         description: "Creates a new game."
         body:
@@ -102,6 +170,7 @@ schemas:
                         schema: game
                         example: |
                             {
+                                "id": 1,
                                 "name": "foo",
                                 "round": 1
                             }
@@ -124,6 +193,7 @@ schemas:
                             schema: game
                             example: |
                                 {
+                                    "id": 1,
                                     "name": "foo",
                                     "round": 4
                                 }
@@ -142,6 +212,7 @@ schemas:
                     schema: game
                     example: |
                         {
+                            "id": 1,
                             "name": "foo",
                             "round": 4
                         }
@@ -162,6 +233,16 @@ schemas:
                                     "deleted": true
                                 }
         /{players}:
+            type:
+                list:
+                    schema: player
+                    example: |
+                        [
+                            {
+                                "id": 1,
+                                "name": "Hans"
+                            }
+                        ]
             description: "Players belonging to the game."
             get:
                 description: "Returns a list of players playing this game."
