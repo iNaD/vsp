@@ -117,7 +117,7 @@ resourceTypes:
 /games:
     type:
         collection:
-            schema: "game"
+            schema: game
             "getexample": |
                 {
                     games: [
@@ -219,6 +219,14 @@ resourceTypes:
                     body:
                         application/json:
                             schema: game
+                404:
+                    description: "Will be returned if the game doesn't exist."
+                    body:
+                        application/json:
+                            example: |
+                                {
+                                    "error": "Unknown game"
+                                }
         delete:
             description: "Deletes the game."
             responses:
@@ -229,6 +237,14 @@ resourceTypes:
                                 {
                                     "game": 1
                                     "deleted": true
+                                }
+                404:
+                    description: "Will be returned if the game doesn't exist."
+                    body:
+                        application/json:
+                            example: |
+                                {
+                                    "error": "Unknown game"
                                 }
         /{players}:
             type:
