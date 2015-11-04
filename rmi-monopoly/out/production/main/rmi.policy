@@ -1,3 +1,0 @@
-grant codeBase "file:C:\Users\daniel\Projekte\haw\vs\rmi-monopoly\src\main\java" {
-    permission java.security.AllPermission;
-};
