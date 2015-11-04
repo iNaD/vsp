@@ -51,58 +51,56 @@ schemas:
         }
 
 resourceTypes:
-  - list:
-      get:
-        description: List of available <<resourcePathName>>
-        responses:
-          200:
+    - list:
+        get:
+            description: List of available <<resourcePathName>>
+            responses:
+                200:
+                    body:
+                        application/json:
+                            schema: |
+                                {
+                                    "type": "object",
+                                    "$schema": "http://json-schema.org/draft-03/schema",
+                                    "id": "http://jsonschema.net",
+                                    "required": true,
+                                    "properties": {
+                                        "<<schema|!pluralize>>": {
+                                            "type": "array",
+                                            "$schema": "http://json-schema.org/draft-03/schema",
+                                            "id": "http://jsonschema.net",
+                                            "required": true,
+                                            "items": { "$ref": "<<schema>>" }
+                                        }
+                                    }
+                                }
+                            example: <<example>>
+    - item:
+        get:
+            description: Gets a <<resourcePathName>>
+            responses:
+                200:
+                    body:
+                        application/json:
+                            schema: <<schema>>
+                            example: <<example>>
+        put:
+            description: places a <<resourcePathName>>
             body:
-              application/json:
-                schema: |
-                  {
-                    "type": "object",
-                    "$schema": "http://json-schema.org/draft-03/schema",
-                    "id": "http://jsonschema.net",
-                    "required": true,
-                    "properties": {"<<schema|!pluralize>>":
-                       {
-                        "type": "array",
-                        "$schema": "http://json-schema.org/draft-03/schema",
-                        "id": "http://jsonschema.net",
-                        "required": true,
-                        "items": {"$ref": "<<schema>>" }
-                      }
-                   }
-                  }
-
-                example: <<example>>
-  - item:
-      get:
-        description: Gets a <<resourcePathName>>
-        responses:
-          200:
-            body:
-              application/json:
+                application/json:
+                    schema: <<schema>>
+                    example: <<example>>
+    - collection:
+        type:
+            list:
                 schema: <<schema>>
-                example: <<example>>
-      put:
-        description: places a <<resourcePathName>>
-        body:
-          application/json:
-            schema: <<schema>>
-            example: <<example>>
-  - collection:
-      type:
-        list:
-          schema: <<schema>>
-          example: <<getexample>>
-      post:
-        description: creates a new <<resourcePathName>
-        body:
-          application/json:
-            schema: <<schema>>
-            example: <<postexample>>
-
+                example: <<getexample>>
+        post:
+            description: creates a new <<resourcePathName>
+            body:
+                application/json:
+                    schema: <<schema>>
+                    example: <<postexample>>
 
 /dice:
     description: "Enables dice interaction."
