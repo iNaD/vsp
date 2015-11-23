@@ -14,7 +14,8 @@ public class Router {
     public Router() {
         post("/boards/:gameid/players/:playerid/roll", (request, response) -> {
             response.type("application/json");
-            return service.roll(request.params(":gameid"), request.params(":playerid"));
+            Throw theThrow = gson.fromJson(request.body(), Throw.class);
+            return service.roll(request.params(":gameid"), request.params(":playerid"), theThrow);
         }, gson::toJson);
 
         put("/boards/:gameid/players/:playerid", (request, response) -> {

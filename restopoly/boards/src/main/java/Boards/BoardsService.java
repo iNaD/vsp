@@ -35,13 +35,13 @@ public class BoardsService {
         return addBoard(gameid, new Board());
     }
 
-    public Map<String, Roll> roll(String gameid, String playerid) {
-        Map<String, Roll> rolls = new HashMap<>();
+    public RollResponse roll(String gameid, String playerid, Throw theThrow) {
+        Board board = getBoard(gameid);
+        Player player = board.getPlayer(playerid);
 
-        rolls.put("roll1", new Roll(1));
-        rolls.put("roll2", new Roll(2));
+        player.setPosition(player.getPosition() + theThrow.sum());
 
-        return rolls;
+        return new RollResponse(player, board);
     }
 
     public Board addPlayer(String gameid, String playerid) {

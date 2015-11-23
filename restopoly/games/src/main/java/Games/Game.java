@@ -7,6 +7,10 @@ public class Game {
 
     private String gameid;
 
+    private String uri;
+
+    private Components components;
+
     private Boolean started = false;
 
     private Player turnMutex = null;
@@ -67,5 +71,21 @@ public class Game {
         }
 
         return false;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public Components getComponents() {
+        return components;
+    }
+
+    public void setComponents(Components components) {
+        this.components = components;
     }
 }

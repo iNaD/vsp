@@ -4,7 +4,7 @@ public class Player {
 
     private String id;
     private String name;
-    private Integer position;
+    private Integer position = 0;
     private Place place;
 
     public Player(String id) {
