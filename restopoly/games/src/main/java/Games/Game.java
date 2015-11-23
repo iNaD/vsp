@@ -9,7 +9,9 @@ public class Game {
 
     private Boolean started = false;
 
-    private List<String> players = new ArrayList<>();
+    private Player turnMutex = null;
+
+    private List<Player> players = new ArrayList<>();
 
     public String getGameid() {
         return gameid;
@@ -19,16 +21,27 @@ public class Game {
         this.gameid = gameid;
     }
 
-    public List<String> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<String> players) {
+    public void setPlayers(List<Player> players) {
         this.players = players;
     }
 
-    public void addPlayer(String player) {
+    public void addPlayer(Player player) {
         this.players.add(player);
+    }
+
+    public Player getPlayer(String playerid) {
+        Player result = null;
+        for(Player player : players) {
+            if(player.getId().equals(playerid)) {
+                result = player;
+            }
+        }
+
+        return result;
     }
 
     public Boolean getStarted() {
@@ -37,5 +50,22 @@ public class Game {
 
     public void setStarted(Boolean started) {
         this.started = started;
+    }
+
+    public Player getTurnMutex() {
+        return turnMutex;
+    }
+
+    public void releaseMutex() {
+        turnMutex = null;
+    }
+
+    public boolean acquireMutex(Player player) {
+        if(turnMutex == null && player != null) {
+            turnMutex = player;
+            return true;
+        }
+
+        return false;
     }
 }

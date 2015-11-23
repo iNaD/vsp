@@ -37,9 +37,28 @@ public class GamesService {
 
     public Game addPlayer(String gameid, String playerid) {
         Game game = getGame(gameid);
-        game.addPlayer(playerid);
+        game.addPlayer(new Player(playerid));
 
         return game;
+    }
+
+    public Game releaseMutex(String gameid) {
+        Game game = getGame(gameid);
+
+        game.releaseMutex();
+
+        return game;
+    }
+
+    public boolean acquireMutex(String gameid, String playerid) {
+        Game game = getGame(gameid);
+        Player player = game.getPlayer(playerid);
+
+        return game.acquireMutex(player);
+    }
+
+    public Player getTurnMutex(String gameid) {
+        return getGame(gameid).getTurnMutex();
     }
 
 }
