@@ -36,6 +36,18 @@ class Router {
             return service.releaseMutex(request.params(":gameid"));
         }, gson::toJson);
 
+        put("/games/:gameid/players/:playerid/ready", (request, response) -> {
+            response.type("application/json");
+            service.getGame(request.params(":gameid")).getPlayer(request.params(":playerid")).setReady(true);
+            return null;
+        }, gson::toJson);
+
+        get("/games/:gameid/players/:playerid/ready", (request, response) -> {
+            response.type("application/json");
+
+            return service.getGame(request.params(":gameid")).getPlayer(request.params(":playerid")).getReady();
+        }, gson::toJson);
+
         put("/games/:gameid/players/:playerid", (request, response) -> {
             response.type("application/json");
             return service.addPlayer(request.params(":gameid"), request.params(":playerid"));

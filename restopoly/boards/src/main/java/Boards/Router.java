@@ -19,7 +19,17 @@ public class Router {
 
         put("/boards/:gameid/players/:playerid", (request, response) -> {
             response.type("application/json");
-            return service.addPlayer(request.params(":gameid"),request.params(":playerid") );
+            return service.addPlayer(request.params(":gameid"), request.params(":playerid"));
+        }, gson::toJson);
+
+        get("/boards/:gameid/players/:playerid", (request, response) -> {
+            response.type("application/json");
+            return service.getPlayer(request.params(":gameid"), request.params(":playerid"));
+        }, gson::toJson);
+
+        get("/boards/:gameid", (request, response) -> {
+            response.type("application/json");
+            return service.getBoard(request.params(":gameid"));
         }, gson::toJson);
 
         put("/boards/:gameid", (request, response) -> {

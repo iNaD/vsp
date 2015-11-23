@@ -51,6 +51,11 @@ public class BoardsService {
         return board;
     }
 
+    public Player getPlayer(String gameid, String playerid) {
+        Board board = getBoard(gameid);
+        return board.getPlayer(playerid);
+    }
+
     public void register() {
         Gson gson = new Gson();
 
