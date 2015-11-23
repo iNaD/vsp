@@ -7,6 +7,8 @@ public class Game {
 
     private String gameid;
 
+    private Boolean started = false;
+
     private List<String> players = new ArrayList<>();
 
     public String getGameid() {
@@ -27,5 +29,13 @@ public class Game {
 
     public void addPlayer(String player) {
         this.players.add(player);
+    }
+
+    public Boolean getStarted() {
+        return started;
+    }
+
+    public void setStarted(Boolean started) {
+        this.started = started;
     }
 }

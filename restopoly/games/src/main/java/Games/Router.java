@@ -7,28 +7,22 @@ class Router {
 
     private Gson gson = new Gson();
 
-    public Router() {
+    private GamesService service = new GamesService();
 
+    public Router() {
         put("/games/:gameid/players/:playerid", (request, response) -> {
-            Game game = new Game();
-            game.setGameid(request.params(":gameid"));
-            game.addPlayer(request.params(":playerid"));
             response.type("application/json");
-            return game;
+            return service.addPlayer(request.params(":gameid"), request.params(":playerid"));
         }, gson::toJson);
 
         post("/games", (request, response) -> {
-            Game game = new Game();
-            game.setGameid("42");
             response.type("application/json");
-            return game;
+            return service.newGame();
         }, gson::toJson);
 
         get("/games", (request, response) -> {
-            Game game = new Game();
-            game.setGameid("42");
             response.type("application/json");
-            return game;
+            return service.getGames();
         }, gson::toJson);
     }
 
