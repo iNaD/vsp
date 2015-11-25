@@ -40,6 +40,7 @@ public class BoardsService {
         Player player = board.getPlayer(playerid);
 
         player.setPosition(player.getPosition() + theThrow.sum());
+        board.updatePosition(player.getId(), player.getPosition());
 
         return new RollResponse(player, board);
     }

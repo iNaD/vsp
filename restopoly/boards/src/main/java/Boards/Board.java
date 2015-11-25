@@ -2,13 +2,17 @@ package Boards;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Board {
 
     private List<Field> fields = new ArrayList<>();
 
     private List<Player> players = new ArrayList<>();
+
+    private Map<String, Integer> positions = new HashMap<>();
 
     private String uri;
 
@@ -51,4 +55,17 @@ public class Board {
     public void setUri(String uri) {
         this.uri = uri;
     }
+
+    public Map<String, Integer> getPositions() {
+        return positions;
+    }
+
+    public void setPositions(Map<String, Integer> positions) {
+        this.positions = positions;
+    }
+
+    public void updatePosition(String playerid, Integer position) {
+        positions.put(playerid, position);
+    }
+
 }
