@@ -48,7 +48,7 @@ public class Router {
             return service.getBoards();
         }, gson::toJson);
 
-//        service.register();
+        service.register();
     }
 
     public static void main(String[] args) {

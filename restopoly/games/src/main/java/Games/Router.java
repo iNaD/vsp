@@ -70,7 +70,7 @@ class Router {
             return service.getGames();
         }, gson::toJson);
 
-//        service.register();
+        service.register();
     }
 
     public static void main(String[] args) {

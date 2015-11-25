@@ -43,7 +43,7 @@
                         </goals>
                         <configuration>
                             <excludeArtifactIds>junit</excludeArtifactIds>
-                            <outputDirectory>${project.build.directory}/bin/lib</outputDirectory>
+                            <outputDirectory>${project.build.directory}/bin</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -56,10 +56,9 @@
                         <manifest>
                             <mainClass>Dice.Router</mainClass>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                     </archive>
-                    <finalName>dice-vsp_abl117</finalName>
+                    <finalName>vsp_abl117</finalName>
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                 </configuration>
             </plugin>

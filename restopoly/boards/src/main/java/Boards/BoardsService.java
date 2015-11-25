@@ -11,9 +11,9 @@ import java.util.Map;
 
 public class BoardsService {
 
-    private static Service service = new Service("Boards", "Provides Board interaction", "boards", "https://vs-docker.informatik.haw-hamburg.de/ports/101171/boards");
+    private static Service service = new Service("Boards", "Provides Board interaction", "boards", "https://vs-docker.informatik.haw-hamburg.de/ports/11171/boards");
 
-    private static String serviceRegistrationUri = "http://vs-docker:8053/services";
+    private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
     private Map<String, Board> boards = new HashMap<>();
 
@@ -64,8 +64,11 @@ public class BoardsService {
         try {
             HttpResponse<JsonNode> response = Unirest
                     .post(serviceRegistrationUri)
-                    .body(gson.toJson(service))
-                    .asJson();
+                    .header("accept", "application/json")
+                    .header("content-type", "application/json")
+                    .body(gson.toJson(service)).asJson();
+
+            System.out.println("Status: " + response.getStatus() + " Body:" + response.getBody().toString());
         } catch (UnirestException e) {
             e.printStackTrace();
         }

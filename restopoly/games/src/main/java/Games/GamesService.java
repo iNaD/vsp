@@ -13,9 +13,9 @@ import java.util.UUID;
 
 public class GamesService {
 
-    private static Service service = new Service("Games", "Provides Game actions", "games", "https://vs-docker.informatik.haw-hamburg.de/ports/101170/games");
+    private static Service service = new Service("Games", "Provides Game actions", "games", "https://vs-docker.informatik.haw-hamburg.de/ports/11170/games");
 
-    private static String serviceRegistrationUri = "http://vs-docker:8053/services";
+    private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
     private List<Game> games = new ArrayList<>();
 
@@ -82,8 +82,11 @@ public class GamesService {
         try {
             HttpResponse<JsonNode> response = Unirest
                     .post(serviceRegistrationUri)
-                    .body(gson.toJson(service))
-                    .asJson();
+                    .header("accept", "application/json")
+                    .header("content-type", "application/json")
+                    .body(gson.toJson(service)).asJson();
+
+            System.out.println("Status: " + response.getStatus() + " Body:" + response.getBody().toString());
         } catch (UnirestException e) {
             e.printStackTrace();
         }
