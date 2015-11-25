@@ -16,6 +16,20 @@ public class Board {
 
     private String uri;
 
+    public Board() {
+        fields.add(new Field(new Place("Los")));
+        fields.add(new Field(new Place("Badstraße")));
+        fields.add(new Field(new Place("Gemeinschaftsfeld")));
+        fields.add(new Field(new Place("Turmstraße")));
+        fields.add(new Field(new Place("Einkommensteuer")));
+        fields.add(new Field(new Place("Südbahnhof")));
+        fields.add(new Field(new Place("Chausseestraße")));
+        fields.add(new Field(new Place("Ereignisfeld")));
+        fields.add(new Field(new Place("Elisenstraße")));
+        fields.add(new Field(new Place("Poststraße")));
+        fields.add(new Field(new Place("Gefängnis / Besucher")));
+    }
+
     public List<Field> getFields() {
         return fields;
     }
@@ -64,8 +78,17 @@ public class Board {
         this.positions = positions;
     }
 
-    public void updatePosition(String playerid, Integer position) {
-        positions.put(playerid, position);
+    public void updatePosition(Player player, Integer newPosition) {
+        Integer oldPosition = player.getPosition();
+
+        if(oldPosition != null) {
+            fields.get(oldPosition).removePlayer(player.getId());
+        }
+
+        Integer position = newPosition % fields.size();
+        player.setPosition(position);
+        fields.get(position).addPlayer(player.getId());
+        positions.put(player.getId(), position);
     }
 
 }

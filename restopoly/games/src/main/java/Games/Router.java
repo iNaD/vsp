@@ -62,12 +62,15 @@ class Router {
         }, gson::toJson);
 
         post("/games", (request, response) -> {
+            response.status(201);
             return service.newGame();
         }, gson::toJson);
 
         get("/games", (request, response) -> {
             return service.getGames();
         }, gson::toJson);
+
+//        service.register();
     }
 
     public static void main(String[] args) {

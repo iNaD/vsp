@@ -1,5 +1,10 @@
 package Games;
 
+import com.google.gson.Gson;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import spark.QueryParamsMap;
 
 import java.util.ArrayList;
@@ -8,6 +13,10 @@ import java.util.Set;
 import java.util.UUID;
 
 public class GamesService {
+
+    private static Service service = new Service("games", "Games Service", "games", "http://localhost:4567/games");
+
+    private static String serviceRegistrationUri = "http://vs-docker:8053/services";
 
     private List<Game> games = new ArrayList<>();
 
@@ -66,6 +75,19 @@ public class GamesService {
 
     public Player getTurnMutex(String gameid) {
         return getGame(gameid).getTurnMutex();
+    }
+
+    public void register() {
+        Gson gson = new Gson();
+
+        try {
+            HttpResponse<JsonNode> response = Unirest
+                    .post(serviceRegistrationUri)
+                    .body(gson.toJson(service))
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -13,7 +13,7 @@ public class BoardsService {
 
     private static Service service = new Service("boards", "Boards Service", "boards", "http://localhost:4567/boards");
 
-    private static String serviceRegistrationUri = "https://vs-docker.informatik.haw-hamburg.de/ports/8053/services";
+    private static String serviceRegistrationUri = "http://vs-docker:8053/services";
 
     private Map<String, Board> boards = new HashMap<>();
 
@@ -39,15 +39,16 @@ public class BoardsService {
         Board board = getBoard(gameid);
         Player player = board.getPlayer(playerid);
 
-        player.setPosition(player.getPosition() + theThrow.sum());
-        board.updatePosition(player.getId(), player.getPosition());
+        board.updatePosition(player, player.getPosition() + theThrow.sum());
 
         return new RollResponse(player, board);
     }
 
     public Board addPlayer(String gameid, String playerid) {
         Board board = getBoard(gameid);
-        board.addPlayer(new Player(playerid));
+        Player player = new Player(playerid);
+        board.addPlayer(player);
+        board.updatePosition(player, 0);
 
         return board;
     }
