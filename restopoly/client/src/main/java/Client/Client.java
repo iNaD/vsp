@@ -82,7 +82,22 @@ public class Client {
     public static void waitForReady() {
         readCli("Press Enter if you are ready to play:");
 
-        playerReady = true;
+        try {
+            HttpResponse<String> response = Unirest.put(Options.getSetting("gamesUri") + "/{gameid}/players/{playerid}/ready")
+                    .header("accept", "application/json")
+                    .routeParam("gameid", gameId)
+                    .routeParam("playerid", playerId)
+                    .asString();
+
+            if(response.getStatus() == 200) {
+                playerReady = true;
+            } else {
+                playerReady = false;
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            playerReady = false;
+        }
     }
 
     public static void gameMenu() throws UnirestException {
