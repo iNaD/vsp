@@ -9,12 +9,11 @@ import spark.QueryParamsMap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class GamesService {
 
-    private static Service service = new Service("games", "Games Service", "games", "http://localhost:4567/games");
+    private static Service service = new Service("Games", "Provides Game actions", "games", "https://vs-docker.informatik.haw-hamburg.de/ports/101170/games");
 
     private static String serviceRegistrationUri = "http://vs-docker:8053/services";
 

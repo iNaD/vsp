@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class BoardsService {
 
-    private static Service service = new Service("boards", "Boards Service", "boards", "http://localhost:4567/boards");
+    private static Service service = new Service("Boards", "Provides Board interaction", "boards", "https://vs-docker.informatik.haw-hamburg.de/ports/101171/boards");
 
     private static String serviceRegistrationUri = "http://vs-docker:8053/services";
 

@@ -57,8 +57,6 @@ public class Client {
         return response.getBody().getObject();
     }
 
-
-
     public static void readPlayerId() {
         String input = readCli("Please enter your player id:");
 
