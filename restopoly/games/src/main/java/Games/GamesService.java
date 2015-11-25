@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class GamesService {
 
-    private List<Game> games = new ArrayList<Game>();
+    private List<Game> games = new ArrayList<>();
 
     public Game newGame() {
         Game game = new Game();

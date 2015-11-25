@@ -33,8 +33,14 @@ public class Game {
         this.players = players;
     }
 
-    public void addPlayer(Player player) {
-        this.players.add(player);
+    public boolean addPlayer(Player player) {
+        if(getPlayer(player.getId()) == null) {
+            this.players.add(player);
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Player getPlayer(String playerid) {

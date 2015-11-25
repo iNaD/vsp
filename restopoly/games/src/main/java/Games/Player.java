@@ -2,9 +2,9 @@ package Games;
 
 public class Player {
 
-    String id;
-    String name;
-    Boolean ready = false;
+    private String id;
+    private String name;
+    private Boolean ready = false;
 
     public Player(String id) {
         this.id = id;
