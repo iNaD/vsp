@@ -1,6 +1,8 @@
 package Games;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
 import static spark.Spark.*;
 
 class Router {
@@ -19,7 +21,7 @@ class Router {
         }, gson::toJson);
 
         put("/games/:gameid/players/turn", (request, response) -> {
-            if(request.body().length() > 0) {
+            try {
                 Player player = gson.fromJson(request.body(), Player.class);
 
                 if (service.acquireMutex(request.params(":gameid"), player.getId())) {
@@ -31,7 +33,7 @@ class Router {
                         response.status(409);
                     }
                 }
-            } else {
+            } catch(NullPointerException|JsonSyntaxException e) {
                 response.status(400);
             }
 

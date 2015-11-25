@@ -2,6 +2,7 @@ package Boards;
 
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import static spark.Spark.*;
 
@@ -17,8 +18,14 @@ public class Router {
         });
 
         post("/boards/:gameid/players/:playerid/roll", (request, response) -> {
-            Throw theThrow = gson.fromJson(request.body(), Throw.class);
-            return service.roll(request.params(":gameid"), request.params(":playerid"), theThrow);
+            try {
+                Throw theThrow = gson.fromJson(request.body(), Throw.class);
+
+                return service.roll(request.params(":gameid"), request.params(":playerid"), theThrow);
+            } catch(NullPointerException|JsonSyntaxException e) {
+                response.status(400);
+                return "";
+            }
         }, gson::toJson);
 
         put("/boards/:gameid/players/:playerid", (request, response) -> {
