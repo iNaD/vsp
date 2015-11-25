@@ -7,13 +7,13 @@ public class Game {
 
     private String gameid;
 
-    private String uri;
-
     private Components components;
 
     private Boolean started = false;
 
     private Player turnMutex = null;
+
+    private String uri;
 
     private List<Player> players = new ArrayList<>();
 
@@ -94,4 +94,5 @@ public class Game {
     public void setComponents(Components components) {
         this.components = components;
     }
+
 }

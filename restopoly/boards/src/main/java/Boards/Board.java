@@ -10,6 +10,8 @@ public class Board {
 
     private List<Player> players = new ArrayList<>();
 
+    private String uri;
+
     public List<Field> getFields() {
         return fields;
     }
@@ -40,5 +42,13 @@ public class Board {
         }
 
         return result;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

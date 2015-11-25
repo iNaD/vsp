@@ -19,16 +19,20 @@ class Router {
         }, gson::toJson);
 
         put("/games/:gameid/players/turn", (request, response) -> {
-            Player player = gson.fromJson(request.body(), Player.class);
+            if(request.body().length() > 0) {
+                Player player = gson.fromJson(request.body(), Player.class);
 
-            if(service.acquireMutex(request.params(":gameid"), player.getId())) {
-                response.status(201);
-            } else {
-                if(service.getTurnMutex(request.params(":gameid")).getId().equals(player.getId())) {
-                    response.status(200);
+                if (service.acquireMutex(request.params(":gameid"), player.getId())) {
+                    response.status(201);
                 } else {
-                    response.status(409);
+                    if (service.getTurnMutex(request.params(":gameid")).getId().equals(player.getId())) {
+                        response.status(200);
+                    } else {
+                        response.status(409);
+                    }
                 }
+            } else {
+                response.status(400);
             }
 
             return "";
@@ -48,7 +52,7 @@ class Router {
         }, gson::toJson);
 
         put("/games/:gameid/players/:playerid", (request, response) -> {
-            return service.addPlayer(request.params(":gameid"), request.params(":playerid"));
+            return service.addPlayer(request.params(":gameid"), request.params(":playerid"), request.queryMap());
         }, gson::toJson);
 
         get("/games/:gameid/players", (request, response) -> {

@@ -1,7 +1,10 @@
 package Games;
 
+import spark.QueryParamsMap;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class GamesService {
@@ -35,9 +38,13 @@ public class GamesService {
         return games;
     }
 
-    public Game addPlayer(String gameid, String playerid) {
+    public Game addPlayer(String gameid, String playerid, QueryParamsMap queryParams) {
         Game game = getGame(gameid);
-        game.addPlayer(new Player(playerid));
+
+        String name = queryParams.get("name").value();
+        String uri = queryParams.get("uri").value();
+
+        game.addPlayer(new Player(playerid, name, uri));
 
         return game;
     }
