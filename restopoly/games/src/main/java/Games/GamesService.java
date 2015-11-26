@@ -5,7 +5,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import spark.QueryParamsMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +12,26 @@ import java.util.UUID;
 
 public class GamesService {
 
-    private static Service service = new Service("Games", "Provides Game actions", "games", "https://vs-docker.informatik.haw-hamburg.de/ports/11170/games");
+    private static String serviceUri = "https://vs-docker.informatik.haw-hamburg.de/ports/11170/games";
+
+    private static Service service = new Service("Games", "Provides Game actions", "games", serviceUri);
 
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
     private List<Game> games = new ArrayList<>();
 
+    public static String getServiceUri() {
+        return serviceUri;
+    }
+
+    public static void setServiceUri(String serviceUri) {
+        GamesService.serviceUri = serviceUri;
+    }
+
     public Game newGame() {
         Game game = new Game();
         game.setGameid(UUID.randomUUID().toString());
+        game.setUri(serviceUri + "/" + game.getGameid());
         return addGame(game);
     }
 
@@ -42,19 +52,17 @@ public class GamesService {
         return result;
     }
 
-    public List<Game> getGames() {
-        return games;
+    public GamesList getGames() {
+        return new GamesList(games);
     }
 
-    public Game addPlayer(String gameid, String playerid, QueryParamsMap queryParams) {
+    public Player addPlayer(String gameid, String playerid, String name, String uri) {
         Game game = getGame(gameid);
 
-        String name = queryParams.get("name").value();
-        String uri = queryParams.get("uri").value();
+        Player player = new Player(playerid, name, uri);
+        game.addPlayer(player);
 
-        game.addPlayer(new Player(playerid, name, uri));
-
-        return game;
+        return player;
     }
 
     public Game releaseMutex(String gameid) {

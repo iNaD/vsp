@@ -55,4 +55,28 @@ public class Player {
         this.uri = uri;
     }
 
+    public boolean equals(Object o) {
+        if(this == o) {
+            return true;
+        }
+
+        if(!(o instanceof Player)) {
+            return false;
+        }
+
+        if(!this.getId().equals(((Player) o).getId())) {
+            return false;
+        }
+
+        if(!this.getName().equals(((Player) o).getName())) {
+            return false;
+        }
+
+        if(!this.getUri().equals(((Player) o).getUri())) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

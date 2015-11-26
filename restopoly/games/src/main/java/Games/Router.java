@@ -44,9 +44,13 @@ class Router {
             return service.releaseMutex(request.params(":gameid"));
         }, gson::toJson);
 
+        get("/games/:gameid/players/current", (request, response) -> {
+            return service.getGame(request.params(":gameid")).getTurnMutex();
+        }, gson::toJson);
+
         put("/games/:gameid/players/:playerid/ready", (request, response) -> {
             service.getGame(request.params(":gameid")).getPlayer(request.params(":playerid")).setReady(true);
-            return null;
+            return true;
         }, gson::toJson);
 
         get("/games/:gameid/players/:playerid/ready", (request, response) -> {
@@ -54,11 +58,15 @@ class Router {
         }, gson::toJson);
 
         put("/games/:gameid/players/:playerid", (request, response) -> {
-            return service.addPlayer(request.params(":gameid"), request.params(":playerid"), request.queryMap());
+            return service.addPlayer(request.params(":gameid"), request.params(":playerid"), request.queryParams("name"), request.queryParams("uri"));
         }, gson::toJson);
 
         get("/games/:gameid/players", (request, response) -> {
             return service.getGame(request.params(":gameid")).getPlayers();
+        }, gson::toJson);
+
+        get("/games/:gameid", (request, response) -> {
+            return service.getGame(request.params(":gameid"));
         }, gson::toJson);
 
         post("/games", (request, response) -> {
@@ -76,5 +84,4 @@ class Router {
     public static void main(String[] args) {
         new Router();
     }
-
 }
