@@ -6,7 +6,9 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BoardsService {
@@ -34,6 +36,8 @@ public class BoardsService {
     public Board newBoard(String gameid) {
         return addBoard(gameid, new Board());
     }
+
+    public void deleteBoard(String gameid) { boards.remove(gameid); }
 
     public RollResponse roll(String gameid, String playerid, Throw theThrow) {
         Board board = getBoard(gameid);
@@ -72,5 +76,35 @@ public class BoardsService {
         } catch (UnirestException e) {
             e.printStackTrace();
         }
+    }
+
+    public void removePlayer(String gameid, String playerid) {
+        getBoard(gameid).removePlayer(playerid);
+    }
+
+    public Place getPlace(String gameid, String placeName) {
+        List<Place> places = getPlaces(gameid);
+        Place result = null;
+
+        for (Place place : places) {
+            if(place.getName().equals(placeName)) {
+                result = place;
+            }
+        }
+
+        return result;
+    }
+
+    public List<Place> getPlaces(String gameid) {
+        List<Field> fields = getBoard(gameid).getFields();
+        List<Place> places = new ArrayList<>();
+
+        for (Field field : fields) {
+            places.add(field.getPlace());
+        }
+
+        return places;
+
+
     }
 }
