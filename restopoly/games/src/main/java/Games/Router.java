@@ -47,9 +47,13 @@ class Router {
             return service.releaseMutex(request.params(":gameid"));
         }, gson::toJson);
 
+        get("/games/:gameid/players/current", (request, response) -> {
+            return service.getGame(request.params(":gameid")).getTurnMutex();
+        }, gson::toJson);
+
         put("/games/:gameid/players/:playerid/ready", (request, response) -> {
             service.getGame(request.params(":gameid")).getPlayer(request.params(":playerid")).setReady(true);
-            return null;
+            return true;
         }, gson::toJson);
 
         get("/games/:gameid/players/:playerid/ready", (request, response) -> {
@@ -57,23 +61,22 @@ class Router {
         }, gson::toJson);
 
         put("/games/:gameid/players/:playerid", (request, response) -> {
-        	String playeridRequest= request.params("playerid");
-            Game game= service.addPlayer(request.params(":gameid"), playeridRequest, request.queryMap());
-            String gameid=game.getGameid();
+        	String playeridRequest = request.params("playerid");
+        	String gameidRequest = request.params("gameid");
+            Player player = service.addPlayer(gameidRequest, playeridRequest, request.queryParams("name"), request.queryParams("uri"));
             
-            service.newBoardPlayer(gameid, playeridRequest);
-            return game;
+            service.newBoardPlayer(gameidRequest, playeridRequest);
+            
+            return player;
         }, gson::toJson);
 
         get("/games/:gameid/players", (request, response) -> {
             return service.getGame(request.params(":gameid")).getPlayers();
         }, gson::toJson);
-
-//        post("/games", (request, response) -> {
-//            response.status(201);
-//            return service.newGame();
-//            
-//        }, gson::toJson);
+            
+        get("/games/:gameid", (request, response) -> {
+            return service.getGame(request.params(":gameid"));
+        }, gson::toJson);
         
         post("/games", (request, response) -> {
             response.status(201);
@@ -82,14 +85,13 @@ class Router {
             //Unirest
             service.newBoard(gameid);
             return game;
-            
         }, gson::toJson);
 
         get("/games", (request, response) -> {
             return service.getGames();
         }, gson::toJson);
 
-//        service.register();
+        service.register();
     }
 
     public static void main(String[] args) {

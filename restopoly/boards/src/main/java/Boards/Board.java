@@ -1,10 +1,7 @@
 package Boards;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Board {
 
@@ -48,6 +45,16 @@ public class Board {
 
     public void addPlayer(Player player) {
         players.add(player);
+    }
+
+    public void removePlayer(String playerid) {
+        for(Iterator<Player> playerIterator = players.listIterator(); playerIterator.hasNext();) {
+            Player player = playerIterator.next();
+
+            if(player.getId().equals(playerid)) {
+                playerIterator.remove();
+            }
+        }
     }
 
     public Player getPlayer(String playerid) {

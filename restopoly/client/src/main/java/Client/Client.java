@@ -10,11 +10,13 @@ import static Client.Tools.readCli;
 
 public class Client {
 
-    private static boolean playerReady = false;
-    private static String playerId = null;
-    private static String gameId = null;
+    protected static String gameId = null;
+
+    protected static PlayerService playerService;
 
     public static void main(String[] args) throws UnirestException {
+        playerService = new PlayerService();
+
         System.out.println("Welcome to RESTopoly!");
 
         Options.menu();
@@ -27,15 +29,32 @@ public class Client {
 
         gameMenu();
 
-        if(gameId != null && playerId != null) {
-            System.out.println("Registering you (" + playerId + ") with the game " + gameId + ".");
-            System.out.println(addPlayerToGame(gameId, playerId).toString());
+        if(gameId != null && playerService.getPlayer() != null) {
+            System.out.println("Registering you (" + playerService.getPlayer().getId() + ") with the game " + gameId + ".");
+            System.out.println(addPlayerToGame(gameId, playerService.getPlayer()));
+
+            playerService.startRouter();
 
             waitForReady();
 
-            System.out.println("You (" + playerId + ") are ready to play!");
+            System.out.println("You (" + playerService.getPlayer().getId() + ") are ready to play!");
+
+            waitForQuit();
+
+            playerService.stopRouter();
         } else {
             System.out.println("Hmm... seems we are missing either the game or the player id. Please try again :(");
+        }
+    }
+
+    private static void waitForQuit() {
+        String input = readCli("Press q if you want to quit:");
+
+        if(input.equals("q")) {
+            return;
+        } else {
+            System.out.println("Not q, still waiting for quit.");
+            waitForQuit();
         }
     }
 
@@ -47,11 +66,11 @@ public class Client {
         return response.getBody().getObject();
     }
 
-    public static JSONObject addPlayerToGame(String gameId, String playerId) throws UnirestException {
+    public static JSONObject addPlayerToGame(String gameId, Player player) throws UnirestException {
         HttpResponse<JsonNode> response = Unirest.put(Options.getSetting("gamesUri") + "/{gameid}/players/{playerid}")
                 .header("accept", "application/json")
                 .routeParam("gameid", gameId)
-                .routeParam("playerid", playerId)
+                .routeParam("playerid", player.getId())
                 .asJson();
 
         return response.getBody().getObject();
@@ -61,7 +80,7 @@ public class Client {
         String input = readCli("Please enter your player id:");
 
         if(input.length() > 0) {
-            playerId = input;
+            playerService.setPlayer(new Player(input));
         } else {
             System.out.println("Invalid player id: " + input);
             readPlayerId();
@@ -82,7 +101,22 @@ public class Client {
     public static void waitForReady() {
         readCli("Press Enter if you are ready to play:");
 
-        playerReady = true;
+        try {
+            HttpResponse<String> response = Unirest.put(Options.getSetting("gamesUri") + "/{gameid}/players/{playerid}/ready")
+                    .header("accept", "application/json")
+                    .routeParam("gameid", gameId)
+                    .routeParam("playerid", playerService.getPlayer().getId())
+                    .asString();
+
+            if(response.getStatus() == 200) {
+                playerService.getPlayer().setReady(true);
+            } else {
+                playerService.getPlayer().setReady(false);
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            playerService.getPlayer().setReady(false);
+        }
     }
 
     public static void gameMenu() throws UnirestException {

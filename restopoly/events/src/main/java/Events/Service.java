@@ -1,4 +1,4 @@
-package Boards;
+package Events;
 
 public class Service {
     String name;
