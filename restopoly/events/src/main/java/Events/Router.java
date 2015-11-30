@@ -1,9 +1,6 @@
 package Events;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
-import java.util.List;
 
 import static spark.Spark.*;
 

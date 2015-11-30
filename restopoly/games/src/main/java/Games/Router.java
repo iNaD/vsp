@@ -1,10 +1,7 @@
 package Games;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.mashape.unirest.http.HttpResponse;
 
 import static spark.Spark.*;
 
@@ -64,20 +61,20 @@ class Router {
         	String playeridRequest = request.params("playerid");
         	String gameidRequest = request.params("gameid");
             Player player = service.addPlayer(gameidRequest, playeridRequest, request.queryParams("name"), request.queryParams("uri"));
-            
+
             service.newBoardPlayer(gameidRequest, playeridRequest);
-            
+
             return player;
         }, gson::toJson);
 
         get("/games/:gameid/players", (request, response) -> {
             return service.getGame(request.params(":gameid")).getPlayers();
         }, gson::toJson);
-            
+
         get("/games/:gameid", (request, response) -> {
             return service.getGame(request.params(":gameid"));
         }, gson::toJson);
-        
+
         post("/games", (request, response) -> {
             response.status(201);
             Game game=service.newGame();
