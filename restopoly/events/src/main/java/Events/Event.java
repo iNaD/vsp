@@ -6,6 +6,15 @@ public class Event {
     protected String reason;
     protected String resource;
     protected Player player;
+    protected String uri;
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 
     public String getType() {
         return type;
@@ -49,8 +58,8 @@ public class Event {
 
     @Override
     public String toString() {
-        String s = "Event(type=%s, name=%s, reason=%s, resource=%s, player=%s)";
+        String s = "Event(type=%s, name=%s, reason=%s, resource=%s, player=%s, uri=%s)";
 
-        return String.format(s, type, name, reason, resource, player.getId());
+        return String.format(s, type, name, reason, resource, player.getId(), uri);
     }
 }
