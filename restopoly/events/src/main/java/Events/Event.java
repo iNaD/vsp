@@ -72,4 +72,39 @@ public class Event {
 
         return String.format(s, id, type, name, reason, resource, player.getId(), uri);
     }
+
+    public boolean matches(Event event) {
+
+        if(name != null) {
+            if(!event.getName().matches(name)) {
+                return false;
+            }
+        }
+
+        if(type != null) {
+            if(!event.getType().matches(type)) {
+                return false;
+            }
+        }
+
+        if(reason != null) {
+            if(!event.getReason().matches(reason)) {
+                return false;
+            }
+        }
+
+        if(resource != null) {
+            if(!event.getResource().matches(resource)) {
+                return false;
+            }
+        }
+
+        if(uri != null) {
+            if(!event.getUri().matches(uri)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

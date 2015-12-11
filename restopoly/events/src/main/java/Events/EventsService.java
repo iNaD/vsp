@@ -67,6 +67,15 @@ public class EventsService {
 
     public Event addEvent(String gameid, Event event) {
         getEventslist(gameid).events.add(event);
+
+        for(Subscription subscription : subscriptions) {
+            if(subscription.getGameid().equals(gameid)) {
+                if(subscription.getEvent().matches(event)) {
+                    subscription.sendEvent(event);
+                }
+            }
+        }
+
         return event;
     }
 
