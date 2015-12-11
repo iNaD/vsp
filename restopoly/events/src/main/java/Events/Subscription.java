@@ -71,6 +71,12 @@ public class Subscription {
         events.add(event);
 
         try {
+            System.out.println("Sending events:");
+
+            for (Event e : events) {
+                System.out.println(e);
+            }
+
             HttpResponse<JsonNode> response = Unirest
                     .post(callbackuri)
                     .header("accept", "application/json")

@@ -66,45 +66,67 @@ public class Event {
         this.player = player;
     }
 
+    public boolean matches(Event event) {
+
+        if(name != null) {
+            System.out.println("Matching if name \"" + event.getName() + "\" is like \"" + name + "\"");
+
+            if(!event.getName().matches(name)) {
+                return false;
+            }
+
+            System.out.println("Name matched!");
+        }
+
+        if(type != null) {
+            System.out.println("Matching if type \"" + event.getType() + "\" is like \"" + type + "\"");
+
+            if(!event.getType().matches(type)) {
+                return false;
+            }
+
+            System.out.println("Type matched.");
+        }
+
+        if(reason != null) {
+            System.out.println("Matching if reason \"" + event.getReason() + "\" is like \"" + reason + "\"");
+
+            if(!event.getReason().matches(reason)) {
+                return false;
+            }
+
+            System.out.println("Reason matched.");
+        }
+
+        if(resource != null) {
+            System.out.println("Matching if resource \"" + event.getResource() + "\" is like \"" + resource + "\"");
+
+            if(!event.getResource().matches(resource)) {
+                return false;
+            }
+
+            System.out.println("Resource matched.");
+        }
+
+        if(uri != null) {
+            System.out.println("Matching if uri \"" + event.getUri() + "\" is like \"" + uri + "\"");
+
+            if(!event.getUri().matches(uri)) {
+                return false;
+            }
+
+            System.out.println("URI Macthed");
+        }
+
+        System.out.println("Event matched!");
+
+        return true;
+    }
+
     @Override
     public String toString() {
         String s = "Event(id=%s, type=%s, name=%s, reason=%s, resource=%s, player=%s, uri=%s)";
 
-        return String.format(s, id, type, name, reason, resource, player.getId(), uri);
-    }
-
-    public boolean matches(Event event) {
-
-        if(name != null) {
-            if(!event.getName().matches(name)) {
-                return false;
-            }
-        }
-
-        if(type != null) {
-            if(!event.getType().matches(type)) {
-                return false;
-            }
-        }
-
-        if(reason != null) {
-            if(!event.getReason().matches(reason)) {
-                return false;
-            }
-        }
-
-        if(resource != null) {
-            if(!event.getResource().matches(resource)) {
-                return false;
-            }
-        }
-
-        if(uri != null) {
-            if(!event.getUri().matches(uri)) {
-                return false;
-            }
-        }
-
-        return true;
+        return String.format(s, id, type, name, reason, resource, player != null ? player.getId() : null, uri);
     }
 }

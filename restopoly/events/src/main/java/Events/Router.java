@@ -93,11 +93,16 @@ class Router {
             String gameid = request.queryParams("gameid");
             if(gameid != null) {
                 Event event = gson.fromJson(request.body(), Event.class);
-                event.setId(UUID.randomUUID().toString());
+                if(event != null) {
+                    event.setId(UUID.randomUUID().toString());
 
-                service.addEvent(gameid, event);
-                response.status(201);
-                return event;
+                    service.addEvent(gameid, event);
+                    response.status(201);
+                    return event;
+                } else {
+                    response.status(400);
+                    return "no event was given.";
+                }
             } else {
                 response.status(400);
                 return "gameid is mandatory.";
@@ -107,7 +112,13 @@ class Router {
         get("/events", (request, response) -> {
             String gameid = request.queryParams("gameid");
             if(gameid != null) {
-                return service.getEvents(gameid);
+                EventsList events = service.getEvents(gameid);
+                if(events != null) {
+                    return events;
+                } else {
+                    response.status(404);
+                    return null;
+                }
             } else {
                 response.status(400);
                 return "gameid is mandatory.";
