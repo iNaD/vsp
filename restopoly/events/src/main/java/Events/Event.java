@@ -1,12 +1,22 @@
 package Events;
 
 public class Event {
+
+    protected String id;
     protected String type;
     protected String name;
     protected String reason;
     protected String resource;
     protected Player player;
     protected String uri;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getUri() {
         return uri;
@@ -58,8 +68,8 @@ public class Event {
 
     @Override
     public String toString() {
-        String s = "Event(type=%s, name=%s, reason=%s, resource=%s, player=%s, uri=%s)";
+        String s = "Event(id=%s, type=%s, name=%s, reason=%s, resource=%s, player=%s, uri=%s)";
 
-        return String.format(s, type, name, reason, resource, player.getId(), uri);
+        return String.format(s, id, type, name, reason, resource, player.getId(), uri);
     }
 }

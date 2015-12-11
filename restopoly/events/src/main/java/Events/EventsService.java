@@ -6,10 +6,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EventsService {
 
@@ -81,18 +78,36 @@ public class EventsService {
         EventsList events = this.events.get(gameid);
 
         if(events == null) {
-            events = this.events.put(gameid, new EventsList());
+            this.events.put(gameid, new EventsList());
+            return this.events.get(gameid);
+        } else {
+            return events;
         }
-
-        return events;
     }
 
     public void addSubscription(Subscription subscription) {
         this.subscriptions.add(subscription);
     }
 
-    // TODO: How to identify the subscription?
-    public void removeSubscription(String subscription) {
+    public void removeSubscription(String subscriptionId) {
+        for(Iterator<Subscription> subscriptionIterator = subscriptions.listIterator(); subscriptionIterator.hasNext();) {
+            Subscription subscription = subscriptionIterator.next();
 
+            if(subscription.getId().equals(subscriptionId)) {
+                subscriptionIterator.remove();
+            }
+        }
+    }
+
+    public Event getEvent(String gameid, String eventid) {
+        Event event = null;
+
+        for(Event current : this.getEvents(gameid).events) {
+            if(current.getId().equals(eventid)) {
+                event = current;
+            }
+        }
+
+        return event;
     }
 }

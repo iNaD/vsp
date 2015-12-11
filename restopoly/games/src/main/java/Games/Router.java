@@ -77,8 +77,8 @@ class Router {
 
         post("/games", (request, response) -> {
             response.status(201);
-            Game game=service.newGame();
-            String gameid=game.getGameid();
+            Game game = service.newGame();
+            String gameid = game.getGameid();
             //Unirest
             service.newBoard(gameid);
             return game;

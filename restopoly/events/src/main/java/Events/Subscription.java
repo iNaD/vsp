@@ -4,10 +4,19 @@ import com.google.gson.Gson;
 
 public class Subscription {
 
+    protected String id;
     protected String gameid;
     protected String uri;
     protected String callbackuri;
     protected Event event;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getGameid() {
         return gameid;

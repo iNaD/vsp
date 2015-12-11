@@ -2,6 +2,8 @@ package Events;
 
 import com.google.gson.Gson;
 
+import java.util.UUID;
+
 import static spark.Spark.*;
 
 class Router {
@@ -17,12 +19,13 @@ class Router {
 
         delete("/events/subscriptions/:subscription", (request, response) -> {
             String gameid = request.queryParams("gameid");
+
             if(gameid != null) {
                 service.removeSubscription(request.params(":subscription"));
                 return true;
             } else {
                 response.status(400);
-                return false;
+                return "gameid is mandatory.";
             }
         }, gson::toJson);
 
@@ -32,13 +35,14 @@ class Router {
                 Subscription subscription = Subscription.fromJson(request.body());
 
                 subscription.setGameid(gameid);
+                subscription.setId(UUID.randomUUID().toString());
 
                 service.addSubscription(subscription);
 
                 return subscription;
             } else {
                 response.status(400);
-                return false;
+                return "gameid is mandatory.";
             }
         }, gson::toJson);
 
@@ -48,15 +52,27 @@ class Router {
                 return service.getSubscriptions(gameid);
             } else {
                 response.status(400);
-                return false;
+                return "gameid is mandatory.";
             }
         }, gson::toJson);
 
-        // TODO: Which eventid?! Global or local (per game)?
         get("/events/:eventid", (request, response) -> {
+            String gameid = request.queryParams("gameid");
             String eventid = request.params(":eventid");
 
-            return eventid;
+            if(gameid == null) {
+                response.status(400);
+                return "gameid is mandatory.";
+            } else {
+                Event event = service.getEvent(gameid, eventid);
+
+                if (event == null) {
+                    response.status(404);
+                    return null;
+                } else {
+                    return event;
+                }
+            }
         }, gson::toJson);
 
         /*
@@ -69,7 +85,7 @@ class Router {
                 return true;
             } else {
                 response.status(400);
-                return false;
+                return "gameid is mandatory.";
             }
         }, gson::toJson);
 
@@ -77,12 +93,14 @@ class Router {
             String gameid = request.queryParams("gameid");
             if(gameid != null) {
                 Event event = gson.fromJson(request.body(), Event.class);
+                event.setId(UUID.randomUUID().toString());
+
                 service.addEvent(gameid, event);
                 response.status(201);
-                return true;
+                return event;
             } else {
                 response.status(400);
-                return false;
+                return "gameid is mandatory.";
             }
         }, gson::toJson);
 
@@ -92,7 +110,7 @@ class Router {
                 return service.getEvents(gameid);
             } else {
                 response.status(400);
-                return null;
+                return "gameid is mandatory.";
             }
         }, gson::toJson);
 
