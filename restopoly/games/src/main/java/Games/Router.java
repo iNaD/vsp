@@ -1,7 +1,5 @@
 package Games;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.mashape.unirest.http.HttpResponse;

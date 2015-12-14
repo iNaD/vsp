@@ -85,7 +85,7 @@ public class Board {
         this.positions = positions;
     }
 
-    public void updatePosition(Player player, Integer newPosition) {
+    public Field updatePosition(Player player, Integer newPosition) {
         Integer oldPosition = player.getPosition();
 
         if(oldPosition != null) {
@@ -94,8 +94,12 @@ public class Board {
 
         Integer position = newPosition % fields.size();
         player.setPosition(position);
-        fields.get(position).addPlayer(player.getId());
+        Field field = fields.get(position);
+        field.addPlayer(player.getId());
+        
         positions.put(player.getId(), position);
+        
+        return field;
     }
 
 }

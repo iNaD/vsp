@@ -1,9 +1,12 @@
 package Client;
 
+
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+
 import org.json.JSONObject;
 
 import static Client.Tools.readCli;
@@ -130,5 +133,18 @@ public class Client {
             readGameId();
         }
     }
+	//   Spieler Grundstücke kaufen können durch
+	//	post /brokers/{gameid}/places/{placeid}/owner
+	public JSONObject kauf(String gameid, String placeid)
+			throws UnirestException {
+		HttpResponse<JsonNode> response = Unirest
+				.post(Options.getSetting("brokerUri")
+						+ "/{gameid}/places/{placeid}/owner")
+				.header("accept", "application/json")
+				.routeParam("gameid", gameid).routeParam("playerid", placeid)
+				.asJson();
+		return response.getBody().getObject();
+
+	}
 
 }

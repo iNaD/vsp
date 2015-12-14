@@ -1,6 +1,8 @@
 package Boards;
 
 
+import spark.Spark;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -13,8 +15,10 @@ public class Router {
     private BoardsService service = new BoardsService();
 
     public Router() {
+    	Spark.port(4568);
         after((request, response) -> {
             response.type("application/json");
+            
         });
 
         post("/boards/:gameid/players/:playerid/roll", (request, response) -> {

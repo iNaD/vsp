@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public class GamesService {
 
-    private static String serviceUri = "https://vs-docker.informatik.haw-hamburg.de/ports/11170/games";
+    private static String serviceUri = "https://vs-docker.informatik.haw-hamburg.de/ports/11170/games";//    19850
 
     private static Service service = new Service("Games", "Provides Game actions", "games", serviceUri);
 
