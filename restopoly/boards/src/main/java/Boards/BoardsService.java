@@ -38,13 +38,13 @@ public class BoardsService {
 				String placeid=field.getPlace().getName();
 				grundstRegistr( gameid, placeid);
 			}
-			
+
 			}
 		catch(UnirestException e){
 			e.printStackTrace();
 		}
-		
-		
+
+
 		return board;
 	}
 
@@ -63,9 +63,9 @@ public class BoardsService {
 	public RollResponse roll(String gameid, String playerid, Throw theThrow) {
 		Board board = getBoard(gameid);
 		Player player = board.getPlayer(playerid);
-		
+
 		Field newField = board.updatePosition(player, player.getPosition() + theThrow.sum());
-		
+
 		try {
 			visit(gameid, newField.getPlace().getName(), playerid);
 		} catch(UnirestException e) {
@@ -78,11 +78,11 @@ public class BoardsService {
 	public Board addPlayer(String gameid, String playerid) {
 		Board board = getBoard(gameid);
 		Player player = new Player(playerid);
-		
+
 		board.addPlayer(player);
-		
+
 		Field newField = board.updatePosition(player, 0);
-		
+
 		try {
 			visit(gameid, newField.getPlace().getName(), playerid);
 		} catch(UnirestException e) {
@@ -155,15 +155,21 @@ public class BoardsService {
 		return response.getBody().getObject();
 	}
 
-	// /boards die verfügbaren Grundstücke registriert mit
+	// /boards die verfügbaren Grundstücke registriert mit
 	// put /brokers/{gameid}/places/{placeid}
 	public JSONObject grundstRegistr(String gameid, String placeid)
 			throws UnirestException {
+        Estate estate = new Estate();
+        estate.setPlace(placeid);
+
+        Gson gson = new Gson();
+
 		HttpResponse<JsonNode> response = Unirest
 				.put(Options.getSetting("brokerUri")
 						+ "/{gameid}/places/{placeid}")
 				.header("accept", "application/json")
 				.routeParam("gameid", gameid).routeParam("placeid", placeid)
+                .body(gson.toJson(estate))
 				.asJson();
 		return response.getBody().getObject();
 

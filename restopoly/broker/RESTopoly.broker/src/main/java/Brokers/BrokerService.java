@@ -1,5 +1,6 @@
 package Brokers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,51 +19,66 @@ public class BrokerService {
 		return broker;
 	}
 
-	public Broker addPlaces(String gameid, String placeid) {
-		Broker broker = getBroker(gameid);
-		Place place = new Place(placeid);
-		broker.addPlace(place);
-		return broker;
-	}
-
-	public Place getPlace(String gameid, String placeid) {
-		Broker broker = getBroker(gameid);
-		Place place = broker.getPlace(placeid);
-
-		return place;
-	}
-
-	public List<Place> getPlaces(String gameid) {
-		Broker broker = getBroker(gameid);
-		return broker.getPlaces();
-	}
-	// /boards bei /brokers Besuche durch Spieler anmeldet
 	public Broker visit(String gameid, String placeid, String playerid) {
 		Broker broker = getBroker(gameid);
-		Place place=getPlace(gameid,placeid);
-		Player player=new Player(playerid);
-		broker.putPlayer(place, player);
+		Estate estate = broker.getEstate(placeid);
+		// TODO: Player visits estate
 		return broker;
 	}
-	
-	public Broker owner(String gameid, String placeid) {
+
+	public List<Event> setOwner(String gameid, String placeid, Player player) {
 		Broker broker = getBroker(gameid);
-		Place place=getPlace(gameid,placeid);
-		broker.gekauft(place, true);
-		return null;
+		Estate estate = broker.getEstate(placeid);
+
+        if(estate.isOwned()) {
+            return null;
+        }
+
+        estate.setOwner(player.getId());
+        broker.addPlayer(player);
+
+        Event event = new Event("ownership-changed", "Ownership Changed", "Player bought place", estate.getPlace(), player);
+
+        List<Event> events = new ArrayList<>();
+        events.add(event);
+
+        return events;
 	}
-	// Spieler Grundstücke kaufen können durch
-	public Boolean isOwner(String gameid, String placeid) {
+
+	public Player getOwner(String gameid, String placeid) {
 		Broker broker = getBroker(gameid);
-		Place place=getPlace(gameid,placeid);
-		return broker.isOwner(place);
-		 
+        return broker.getPlayer(broker.getEstate(placeid).getOwner());
 	}
-	//  /broker/{gameid}/places/{placeid}/hypothecarycredit 
-	public Object credit(String gameid, String placeid) {
+
+	public List<Event> credit(String gameid, String placeid) {
 		Broker broker = getBroker(gameid);
-		Place place=getPlace(gameid,placeid);
-		
-		return null;
+
+        broker.getCredits().add(placeid);
+
+        Player player = broker.getPlayer(broker.getEstate(placeid).getOwner());
+
+        Event event = new Event("place-credit", "Place Credit", "Player credited a place", placeid, player);
+
+        List<Event> events = new ArrayList<>();
+        events.add(event);
+
+        return events;
 	}
+
+    public EstatesList getEstates(String gameid) {
+        return new EstatesList(this.getBroker(gameid).getEstates().values());
+    }
+
+    public Estate addEstate(String gameid, String placeid, Estate estate) {
+        Broker broker = this.getBroker(gameid);
+        if(!broker.hasEstate(placeid)) {
+            return broker.addEstate(placeid, estate);
+        }
+
+        return broker.getEstate(placeid);
+    }
+
+    public Estate getEstate(String gameid, String placeid) {
+        return getBroker(gameid).getEstate(placeid);
+    }
 }

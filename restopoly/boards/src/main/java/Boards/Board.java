@@ -24,7 +24,7 @@ public class Board {
         fields.add(new Field(new Place("Ereignisfeld")));
         fields.add(new Field(new Place("Elisenstraße")));
         fields.add(new Field(new Place("Poststraße")));
-        fields.add(new Field(new Place("Gefängnis / Besucher")));
+        fields.add(new Field(new Place("Gefängnis")));
     }
 
     public List<Field> getFields() {
@@ -96,9 +96,9 @@ public class Board {
         player.setPosition(position);
         Field field = fields.get(position);
         field.addPlayer(player.getId());
-        
+
         positions.put(player.getId(), position);
-        
+
         return field;
     }
 

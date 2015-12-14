@@ -6,53 +6,61 @@ import java.util.List;
 import java.util.Map;
 
 public class Broker {
-	private List<Place> places = new ArrayList<Place>();
-	private Map<Place,Player> players= new HashMap<Place, Player>();
-	private Map<Place, Boolean> owner= new HashMap<Place, Boolean>();
 
-	public List<Place> getPlaces() {
-		return this.places;
-	}
+    private Map<String, Estate> estates = new HashMap<>();
 
-	public void setPlace(List<Place> p) {
-		this.places = p;
-	}
+    private Map<String, Player> players = new HashMap<>();
 
-	public void addPlace(Place p) {
-		places.add(p);
-	}
+    private List<String> credits = new ArrayList<>();
 
-	public Place getPlace(String name) {
-		Place erg = null;
-		for (Place place : places) {
-			if (place.getName().equals(name)) {
-				erg = place;
-			}
-		}
-		return erg;
-	}
-	public Map<Place,Player> getPlayers(){
-		return this.players;
-	}
-	public void putPlayer(Place place, Player player){
-		players.put(place, player);
-	}
-	public Player getPlayer(Place p){
-		return players.get(p);
-	}
-	public void gekauft(Place place, Boolean kauf){
-		owner.put(place, kauf);
-	}
-	public Boolean isOwner(Place place){
-		Boolean erg = false;
-		Boolean kauf=owner.get(place);
-		if(kauf!=null){
-			erg=kauf;
-		}
-		return erg;
+    public List<String> getCredits() {
+        return credits;
+    }
 
-	}
-	public Map<Place, Boolean> getOwner(){
-		return owner;
-	}
+    public void setCredits(List<String> credits) {
+        this.credits = credits;
+    }
+
+    public Map<String, Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(Map<String, Player> players) {
+        this.players = players;
+    }
+
+    public Map<String, Estate> getEstates() {
+        return estates;
+    }
+
+    public void setEstates(Map<String, Estate> estates) {
+        this.estates = estates;
+    }
+
+    public Estate addEstate(String placeid, Estate estate) {
+        this.estates.put(placeid, estate);
+
+        return estate;
+    }
+
+    public boolean hasEstate(String placeid) {
+        return this.estates.get(placeid) != null;
+    }
+
+    public Estate getEstate(String placeid) {
+        return this.estates.get(placeid);
+    }
+
+    public Player getPlayer(String owner) {
+        if(owner.isEmpty()) {
+            return null;
+        } else {
+            return this.players.get(owner);
+        }
+    }
+
+    public void addPlayer(Player player) {
+        this.players.put(player.getId(), player);
+    }
+
 }
