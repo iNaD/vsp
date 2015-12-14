@@ -180,10 +180,11 @@ public class BoardsService {
 	public JSONObject visit(String gameid, String placeid, String playerid)
 			throws UnirestException {
 		HttpResponse<JsonNode> response = Unirest
-				.put(Options.getSetting("brokerUri")
+				.post(Options.getSetting("brokerUri")
 						+ "/{gameid}/places/{placeid}/visit/{playerid}")
 				.header("accept", "application/json")
-				.routeParam("gameid", gameid).routeParam("playerid", placeid)
+				.routeParam("gameid", gameid).routeParam("placeid", placeid)
+                .routeParam("playerid", playerid)
 				.asJson();
 		return response.getBody().getObject();
 

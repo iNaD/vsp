@@ -1,8 +1,20 @@
 package Brokers;
 
+import com.google.gson.Gson;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 import java.util.*;
 
 public class BrokerService {
+
+    private static Service service = new Service("Brokers",
+            "Provides Broker interaction", "brokers",
+            "https://vs-docker.informatik.haw-hamburg.de/ports/11173/brokers");
+
+    private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
 	private Map<String, Broker> brokers = new HashMap<>();
 
@@ -114,5 +126,22 @@ public class BrokerService {
         events.add(event);
 
         return events;
+    }
+
+    public void register() {
+        Gson gson = new Gson();
+
+        try {
+            HttpResponse<JsonNode> response = Unirest
+                    .post(serviceRegistrationUri)
+                    .header("accept", "application/json")
+                    .header("content-type", "application/json")
+                    .body(gson.toJson(service)).asJson();
+
+            System.out.println("Status: " + response.getStatus() + " Body:"
+                    + response.getBody().toString());
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
     }
 }
