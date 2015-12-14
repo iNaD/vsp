@@ -6,11 +6,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EventsService {
 
@@ -20,7 +16,22 @@ public class EventsService {
 
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
-    private Map<String, List<Event>> events = new HashMap<>();
+    private Map<String, EventsList> events = new HashMap<>();
+
+    private List<Subscription> subscriptions = new ArrayList<>();
+
+
+    public List<Subscription> getSubscriptions(String gameid) {
+        List<Subscription> subscriptions = new ArrayList<>();
+
+        for (Subscription subscription : this.subscriptions) {
+            if(subscription.getGameid().equals(gameid)) {
+                subscriptions.add(subscription);
+            }
+        }
+
+        return subscriptions;
+    }
 
     public static String getServiceUri() {
         return serviceUri;
@@ -30,11 +41,11 @@ public class EventsService {
         EventsService.serviceUri = serviceUri;
     }
 
-    public List<Event> getEvents(String gameid) {
+    public EventsList getEvents(String gameid) {
         return events.get(gameid);
     }
 
-    public void setEvents(String gameid, List<Event> events) {
+    public void setEvents(String gameid, EventsList events) {
         this.events.put(gameid, events);
     }
 
@@ -54,4 +65,60 @@ public class EventsService {
         }
     }
 
+    public Event addEvent(String gameid, Event event) {
+        getEventslist(gameid).events.add(event);
+
+        System.out.println("Searching for matching subscriptions.");
+
+        for(Subscription subscription : subscriptions) {
+            if(subscription.getGameid().equals(gameid)) {
+                if(subscription.getEvent().matches(event)) {
+                    subscription.sendEvent(event);
+                }
+            }
+        }
+
+        return event;
+    }
+
+    public void clearEvents(String gameid) {
+        setEvents(gameid, new EventsList());
+    }
+
+    public EventsList getEventslist(String gameid) {
+        EventsList events = this.events.get(gameid);
+
+        if(events == null) {
+            this.events.put(gameid, new EventsList());
+            return this.events.get(gameid);
+        } else {
+            return events;
+        }
+    }
+
+    public void addSubscription(Subscription subscription) {
+        this.subscriptions.add(subscription);
+    }
+
+    public void removeSubscription(String subscriptionId) {
+        for(Iterator<Subscription> subscriptionIterator = subscriptions.listIterator(); subscriptionIterator.hasNext();) {
+            Subscription subscription = subscriptionIterator.next();
+
+            if(subscription.getId().equals(subscriptionId)) {
+                subscriptionIterator.remove();
+            }
+        }
+    }
+
+    public Event getEvent(String gameid, String eventid) {
+        Event event = null;
+
+        for(Event current : this.getEvents(gameid).events) {
+            if(current.getId().equals(eventid)) {
+                event = current;
+            }
+        }
+
+        return event;
+    }
 }
