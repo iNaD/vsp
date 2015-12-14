@@ -1,9 +1,6 @@
 package Brokers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BrokerService {
 
@@ -80,5 +77,42 @@ public class BrokerService {
 
     public Estate getEstate(String gameid, String placeid) {
         return getBroker(gameid).getEstate(placeid);
+    }
+
+    public List<Event> changeOwner(String gameid, String placeid, Player player) {
+        Broker broker = getBroker(gameid);
+        Estate estate = broker.getEstate(placeid);
+
+        estate.setOwner(player.getId());
+        broker.addPlayer(player);
+
+        Event event = new Event("ownership-changed", "Ownership Changed", "Player owns place", estate.getPlace(), player);
+
+        List<Event> events = new ArrayList<>();
+        events.add(event);
+
+        return events;
+    }
+
+    public List<Event> deleteCredit(String gameid, String placeid) {
+        Broker broker = getBroker(gameid);
+
+        List<String> places = broker.getCredits();
+
+        for (Iterator<String> iterator = places.listIterator(); iterator.hasNext();) {
+            String place = iterator.next();
+            if(place.equals(placeid)) {
+                iterator.remove();
+            }
+        }
+
+        Player player = broker.getPlayer(broker.getEstate(placeid).getOwner());
+
+        Event event = new Event("place-credit-delete", "Place Credit Delete", "Player deleted credit of a place", placeid, player);
+
+        List<Event> events = new ArrayList<>();
+        events.add(event);
+
+        return events;
     }
 }

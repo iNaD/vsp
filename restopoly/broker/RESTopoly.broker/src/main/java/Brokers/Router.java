@@ -1,14 +1,12 @@
 package Brokers;
 
-import static spark.Spark.after;
-import static spark.Spark.get;
-import static spark.Spark.put;
-import static spark.Spark.post;
 import spark.Spark;
 
 import com.google.gson.Gson;
 
 import java.util.List;
+
+import static spark.Spark.*;
 
 public class Router {
 	private Gson gson = new Gson();
@@ -65,6 +63,20 @@ public class Router {
 					request.params(":playerid"));
 		}, gson::toJson);
 
+        put("/brokers/:gameid/places/:placeid/owner" , (request, response) -> {
+            Player player = gson.fromJson(request.body(), Player.class);
+
+            if(player == null) {
+                response.status(400);
+                return null;
+            }
+
+            List<Event> result = service.changeOwner(request.params(":gameid"),
+                    request.params(":placeid"), player);
+
+            return result;
+        });
+
 		post("/brokers/:gameid/places/:placeid/owner" , (request, response) -> {
             Player player = gson.fromJson(request.body(), Player.class);
 
@@ -89,6 +101,10 @@ public class Router {
 
 		put("/brokers/:gameid/places/:placeid/hypothecarycredit", (request, response) -> {
             return service.credit(request.params(":gameid"), request.params(":placeid"));
+        }, gson::toJson);
+
+        delete("/brokers/:gameid/places/:placeid/hypothecarycredit", (request, response) -> {
+            return service.deleteCredit(request.params(":gameid"), request.params(":placeid"));
         }, gson::toJson);
 	}
 
