@@ -15,10 +15,9 @@ public class Router {
     private BoardsService service = new BoardsService();
 
     public Router() {
-    	Spark.port(4568);
         after((request, response) -> {
             response.type("application/json");
-            
+
         });
 
         post("/boards/:gameid/players/:playerid/roll", (request, response) -> {
@@ -78,6 +77,14 @@ public class Router {
     }
 
     public static void main(String[] args) {
+        Integer port = 4567;
+
+        if(args.length > 0) {
+            port = Integer.valueOf(args[0]);
+        }
+
+        Spark.port(port);
+
         new Router();
     }
 

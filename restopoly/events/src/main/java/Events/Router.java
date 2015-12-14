@@ -1,6 +1,7 @@
 package Events;
 
 import com.google.gson.Gson;
+import spark.Spark;
 
 import java.util.UUID;
 
@@ -129,6 +130,14 @@ class Router {
     }
 
     public static void main(String[] args) {
+        Integer port = 4567;
+
+        if(args.length > 0) {
+            port = Integer.valueOf(args[0]);
+        }
+
+        Spark.port(port);
+
         new Router();
     }
 

@@ -2,6 +2,7 @@ package Games;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import spark.Spark;
 
 import static spark.Spark.*;
 
@@ -92,6 +93,14 @@ class Router {
     }
 
     public static void main(String[] args) {
+        Integer port = 4567;
+
+        if(args.length > 0) {
+            port = Integer.valueOf(args[0]);
+        }
+
+        Spark.port(port);
+
         new Router();
     }
 
