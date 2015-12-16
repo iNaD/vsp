@@ -8,7 +8,7 @@ public class Options {
 
     private static HashMap<String, String> settings = new HashMap<String, String>(){{
         put("gamesUri", "http://localhost:4567/games");
-        put("boardUri", "http://localhost:4567/boards");
+        put("boardUri", "http://localhost:4568/boards");
         put("brokerUri", "http://localhost:4569/brokers");
     }};
 
