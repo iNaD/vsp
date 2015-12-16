@@ -99,6 +99,7 @@ class Router {
             port = Integer.valueOf(args[0]);
         }
 
+
         Spark.port(port);
 
         new Router();

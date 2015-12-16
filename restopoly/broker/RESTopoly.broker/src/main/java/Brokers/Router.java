@@ -24,7 +24,14 @@ public class Router {
         }, gson::toJson);
 
         put("/brokers/:gameid/places/:placeid/hypothecarycredit", (request, response) -> {
-            return service.credit(request.params(":gameid"), request.params(":placeid"));
+            List<Event> events = service.credit(request.params(":gameid"), request.params(":placeid"));
+
+            if(events == null) {
+                response.status(400);
+                return "Hypothecary credit already acquired.";
+            }
+
+            return events;
         }, gson::toJson);
 
         delete("/brokers/:gameid/places/:placeid/hypothecarycredit", (request, response) -> {

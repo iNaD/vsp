@@ -20,7 +20,6 @@ public class GamesService {
 
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
-
     private List<Game> games = new ArrayList<>();
     public static String getServiceUri() {
         return serviceUri;
@@ -117,7 +116,7 @@ public class GamesService {
 				.routeParam("playerid",playerid)
 				.asJson();
 		return response.getBody().getObject();
-				
+
 	}
 
 }
