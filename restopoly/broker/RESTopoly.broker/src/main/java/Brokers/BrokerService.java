@@ -173,6 +173,7 @@ public class BrokerService {
             String place = iterator.next();
             if(place.equals(placeid)) {
                 Estate estate = broker.getEstate(place);
+                // Adds 10% credit rate
                 Integer amount = (int) Math.round(estate.getValue() * 1.1);
                 if(bankTransferMoney(amount, estate.getOwner(), TransferAction.DEPOSIT)) {
                     iterator.remove();
