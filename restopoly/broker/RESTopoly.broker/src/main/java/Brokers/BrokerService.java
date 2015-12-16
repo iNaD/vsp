@@ -5,10 +5,15 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import spark.Request;
 import spark.Response;
 
 import java.util.*;
+
+enum TransferAction {
+    DEPOSIT, WITHDRAW
+}
 
 public class BrokerService {
 
@@ -35,36 +40,27 @@ public class BrokerService {
 		Estate estate = broker.getEstate(placeid);
 
         if(
-            estate.isOwned()
-            && !estate.getOwner().equals(playerid)
-            && !broker.placeHasCredit(placeid)
+            estate.isOwned() &&
+            !estate.getOwner().equals(playerid) &&
+            !broker.placeHasCredit(placeid)
         ) {
-            try {
-                HttpResponse<JsonNode> bankResponse = Unirest
-                        .post(Options.getSetting("bankUri") + "/transfer/from/{from}/to/{to}/{amount}")
-                        .routeParam("from", playerid)
-                        .routeParam("to", estate.getOwner())
-                        .routeParam("amount", estate.rent().toString())
-                        .body("Rent for " + estate.getPlace())
-                        .asJson();
+            if(this.playersTransferMoney(estate.rent(), playerid, estate.getOwner(), "Rent for " + estate.getPlace())) {
+                Player player = broker.getPlayer(playerid);
+                Event event = new Event("rent-paid", "Rent paid", "Player paid rent for " + estate.getPlace(), estate.getPlace(), player);
 
-                if(bankResponse.getStatus() == 201) {
-                    Event event = new Event("rent-paid", "Rent paid", "Player paid rent for " + estate.getPlace(), estate.getPlace(), null);
+                this.postEvent(gameid, event);
 
-                    List<Event> events = new ArrayList<>();
-                    events.add(event);
+                List<Event> events = new ArrayList<>();
+                events.add(event);
 
-                    return events;
-                }
-            } catch (UnirestException e) {
-                e.printStackTrace();
+                return events;
             }
         }
 
 		return null;
 	}
 
-	public List<Event> setOwner(Request request, Response response) {
+    public List<Event> setOwner(Request request, Response response) {
         Gson gson = new Gson();
 
         Player player = gson.fromJson(request.body(), Player.class);
@@ -85,26 +81,18 @@ public class BrokerService {
             return null;
         }
 
-        try {
-            HttpResponse<JsonNode> bankResponse = Unirest
-                    .post(Options.getSetting("bankUri") + "/transfer/from/{from}/{amount}")
-                    .routeParam("from", player.getId())
-                    .routeParam("amount", estate.getValue().toString())
-                    .asJson();
+        if(bankTransferMoney(estate.getValue(), player.getId(), TransferAction.DEPOSIT)) {
+            broker.addPlayer(player);
+            estate.setOwner(player.getId());
 
-            if(bankResponse.getStatus() == 201) {
-                broker.addPlayer(player);
-                estate.setOwner(player.getId());
+            Event event = new Event("ownership-changed", "Ownership Changed", "Player bought place", estate.getPlace(), player);
 
-                Event event = new Event("ownership-changed", "Ownership Changed", "Player bought place", estate.getPlace(), player);
+            this.postEvent(gameid, event);
 
-                List<Event> events = new ArrayList<>();
-                events.add(event);
+            List<Event> events = new ArrayList<>();
+            events.add(event);
 
-                return events;
-            }
-        } catch (UnirestException e) {
-            e.printStackTrace();
+            return events;
         }
 
         response.status(500);
@@ -119,16 +107,27 @@ public class BrokerService {
 	public List<Event> credit(String gameid, String placeid) {
 		Broker broker = getBroker(gameid);
 
-        broker.getCredits().add(placeid);
+        if(broker.placeHasCredit(placeid)) {
+            return null;
+        }
 
+        Estate estate = broker.getEstate(placeid);
         Player player = broker.getPlayer(broker.getEstate(placeid).getOwner());
 
-        Event event = new Event("place-credit", "Place Credit", "Player credited a place", placeid, player);
+        if(bankTransferMoney(estate.getValue(), player.getId(), TransferAction.WITHDRAW)) {
+            broker.getCredits().add(placeid);
 
-        List<Event> events = new ArrayList<>();
-        events.add(event);
+            Event event = new Event("place-credit", "Place Credit", "Player credited a place", placeid, player);
 
-        return events;
+            this.postEvent(gameid, event);
+
+            List<Event> events = new ArrayList<>();
+            events.add(event);
+
+            return events;
+        }
+
+        return null;
 	}
 
     public EstatesList getEstates(String gameid) {
@@ -157,6 +156,8 @@ public class BrokerService {
 
         Event event = new Event("ownership-changed", "Ownership Changed", "Player owns place", estate.getPlace(), player);
 
+        this.postEvent(gameid, event);
+
         List<Event> events = new ArrayList<>();
         events.add(event);
 
@@ -171,18 +172,27 @@ public class BrokerService {
         for (Iterator<String> iterator = places.listIterator(); iterator.hasNext();) {
             String place = iterator.next();
             if(place.equals(placeid)) {
-                iterator.remove();
+                Estate estate = broker.getEstate(place);
+                // Adds 10% credit rate
+                Integer amount = (int) Math.round(estate.getValue() * 1.1);
+                if(bankTransferMoney(amount, estate.getOwner(), TransferAction.DEPOSIT)) {
+                    iterator.remove();
+
+                    Player player = broker.getPlayer(broker.getEstate(placeid).getOwner());
+
+                    Event event = new Event("place-credit-delete", "Place Credit Delete", "Player deleted credit of a place", placeid, player);
+
+                    this.postEvent(gameid, event);
+
+                    List<Event> events = new ArrayList<>();
+                    events.add(event);
+
+                    return events;
+                }
             }
         }
 
-        Player player = broker.getPlayer(broker.getEstate(placeid).getOwner());
-
-        Event event = new Event("place-credit-delete", "Place Credit Delete", "Player deleted credit of a place", placeid, player);
-
-        List<Event> events = new ArrayList<>();
-        events.add(event);
-
-        return events;
+        return null;
     }
 
     public void register() {
@@ -200,5 +210,75 @@ public class BrokerService {
         } catch (UnirestException e) {
             e.printStackTrace();
         }
+    }
+
+    private Boolean postEvent(String gameid, Event event) {
+        try {
+            HttpResponse<JsonNode> response = Unirest
+                    .post(Options.getSetting("eventUri") + "/events")
+                    .queryString("gameid", gameid)
+                    .body(event)
+                    .asJson();
+
+            if(response.getStatus() == 201) {
+                return true;
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private Boolean playersTransferMoney(Integer amount, String from, String to, String body) {
+        try {
+            HttpResponse<JsonNode> bankResponse = Unirest
+                    .post(Options.getSetting("bankUri") + "/transfer/from/{from}/to/{to}/{amount}")
+                    .routeParam("from", from)
+                    .routeParam("to", to)
+                    .routeParam("amount", amount.toString())
+                    .body(body)
+                    .asJson();
+
+            if (bankResponse.getStatus() == 201) {
+                return true;
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private Boolean bankTransferMoney(Integer amount, String player, TransferAction action) {
+        return bankTransferMoney(amount, player, action, "");
+    }
+
+    private Boolean bankTransferMoney(Integer amount, String player, TransferAction action, String body) {
+        HttpRequestWithBody request = null;
+
+        if(action.equals(TransferAction.DEPOSIT)) {
+            request = Unirest.post(Options.getSetting("bankUri") + "/transfer/from/{player}/{amount}");
+        } else if(action.equals(TransferAction.WITHDRAW)) {
+            request = Unirest.post(Options.getSetting("bankUri") + "/transfer/to/{player}/{amount}");
+        } else {
+            return false;
+        }
+
+        try {
+            HttpResponse<JsonNode> bankResponse = request
+                    .routeParam("player", player)
+                    .routeParam("amount", amount.toString())
+                    .body(body)
+                    .asJson();
+
+            if (bankResponse.getStatus() == 201) {
+                return true;
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }
