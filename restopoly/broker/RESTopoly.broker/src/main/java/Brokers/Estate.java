@@ -64,4 +64,12 @@ public class Estate {
         return !this.getOwner().isEmpty();
     }
 
+    public Integer cost() {
+        return this.cost.get(this.houses);
+    }
+
+    public Integer rent() {
+        return this.rent.get(this.houses);
+    }
+
 }

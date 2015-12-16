@@ -45,23 +45,7 @@ public class Router {
             return result;
         });
 
-        post("/brokers/:gameid/places/:placeid/owner" , (request, response) -> {
-            Player player = gson.fromJson(request.body(), Player.class);
-
-            if(player == null) {
-                response.status(400);
-                return null;
-            }
-
-            List<Event> result = service.setOwner(request.params(":gameid"),
-                    request.params(":placeid"), player);
-
-            if(result == null) {
-                response.status(409);
-            }
-
-            return result;
-        }, gson::toJson);
+        post("/brokers/:gameid/places/:placeid/owner" , (request, response) -> service.setOwner(request, response), gson::toJson);
 
         get("/brokers/:gameid/places/:placeid/owner", (request, response) -> {
             return service.getOwner(request.params(":gameid"), request.params(":placeid"));
