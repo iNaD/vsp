@@ -63,4 +63,15 @@ public class Broker {
         this.players.put(player.getId(), player);
     }
 
+    public boolean placeHasCredit(String placeid) {
+        boolean result = false;
+
+        for (String place : credits) {
+            if(place.equals(placeid)) {
+                result = true;
+            }
+        }
+
+        return result;
+    }
 }

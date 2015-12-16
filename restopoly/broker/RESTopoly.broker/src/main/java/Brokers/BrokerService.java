@@ -5,6 +5,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import spark.Request;
+import spark.Response;
 
 import java.util.*;
 
@@ -28,30 +30,85 @@ public class BrokerService {
 		return broker;
 	}
 
-	public Broker visit(String gameid, String placeid, String playerid) {
+	public List<Event> visit(String gameid, String placeid, String playerid) {
 		Broker broker = getBroker(gameid);
 		Estate estate = broker.getEstate(placeid);
-		// TODO: Player visits estate
-		return broker;
+
+        if(
+            estate.isOwned()
+            && !estate.getOwner().equals(playerid)
+            && !broker.placeHasCredit(placeid)
+        ) {
+            try {
+                HttpResponse<JsonNode> bankResponse = Unirest
+                        .post(Options.getSetting("bankUri") + "/transfer/from/{from}/to/{to}/{amount}")
+                        .routeParam("from", playerid)
+                        .routeParam("to", estate.getOwner())
+                        .routeParam("amount", estate.rent().toString())
+                        .body("Rent for " + estate.getPlace())
+                        .asJson();
+
+                if(bankResponse.getStatus() == 201) {
+                    Event event = new Event("rent-paid", "Rent paid", "Player paid rent for " + estate.getPlace(), estate.getPlace(), null);
+
+                    List<Event> events = new ArrayList<>();
+                    events.add(event);
+
+                    return events;
+                }
+            } catch (UnirestException e) {
+                e.printStackTrace();
+            }
+        }
+
+		return null;
 	}
 
-	public List<Event> setOwner(String gameid, String placeid, Player player) {
+	public List<Event> setOwner(Request request, Response response) {
+        Gson gson = new Gson();
+
+        Player player = gson.fromJson(request.body(), Player.class);
+
+        if(player == null) {
+            response.status(400);
+            return null;
+        }
+
+        String gameid = request.params(":gameid");
+        String placeid = request.params(":placeid");
+
 		Broker broker = getBroker(gameid);
 		Estate estate = broker.getEstate(placeid);
 
         if(estate.isOwned()) {
+            response.status(409);
             return null;
         }
 
-        estate.setOwner(player.getId());
-        broker.addPlayer(player);
+        try {
+            HttpResponse<JsonNode> bankResponse = Unirest
+                    .post(Options.getSetting("bankUri") + "/transfer/from/{from}/{amount}")
+                    .routeParam("from", player.getId())
+                    .routeParam("amount", estate.getValue().toString())
+                    .asJson();
 
-        Event event = new Event("ownership-changed", "Ownership Changed", "Player bought place", estate.getPlace(), player);
+            if(bankResponse.getStatus() == 201) {
+                broker.addPlayer(player);
+                estate.setOwner(player.getId());
 
-        List<Event> events = new ArrayList<>();
-        events.add(event);
+                Event event = new Event("ownership-changed", "Ownership Changed", "Player bought place", estate.getPlace(), player);
 
-        return events;
+                List<Event> events = new ArrayList<>();
+                events.add(event);
+
+                return events;
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        response.status(500);
+        return null;
 	}
 
 	public Player getOwner(String gameid, String placeid) {

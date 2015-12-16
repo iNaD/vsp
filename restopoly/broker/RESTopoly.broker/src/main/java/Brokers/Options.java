@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 public class Options {
 		  private static HashMap<String, String> settings = new HashMap<String, String>(){{
-		        put("gamesUri", "http://localhost:4567/games");
-		        put("brokerUri", "http://localhost:4569/brokers");
+                put("bankUri", "http://localhost:4571/banks");
 		    }};
 		    public static String getSetting(String key) {
 		        return settings.get(key);
