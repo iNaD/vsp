@@ -57,6 +57,19 @@ public class BoardsService {
 		boards.remove(gameid);
 	}
 
+    public void move(String gameid, String playerid, Integer steps) {
+        Board board = getBoard(gameid);
+        Player player = board.getPlayer(playerid);
+
+        Field newField = board.updatePosition(player, player.getPosition() + steps);
+
+        try {
+            visit(gameid, newField.getPlace().getName(), playerid);
+        } catch(UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
 	public RollResponse roll(String gameid, String playerid, Throw theThrow) {
 		Board board = getBoard(gameid);
 		Player player = board.getPlayer(playerid);
@@ -187,4 +200,9 @@ public class BoardsService {
 
 	}
 
+    public void addPlace(String gameid, String placeName, Place place) {
+        place.setName(placeName);
+        Field field = new Field(place);
+        getBoard(gameid).getFields().add(field);
+    }
 }

@@ -58,6 +58,12 @@ class Router {
             return service.getGame(request.params(":gameid")).getPlayer(request.params(":playerid")).getReady();
         }, gson::toJson);
 
+        delete("/games/:gameid/players/:playerid", (request, response) -> {
+            service.getGame(request.params(":gameid")).removePlayer(request.params(":playerid"));
+
+            return true;
+        }, gson::toJson);
+
         put("/games/:gameid/players/:playerid", (request, response) -> {
         	String playeridRequest = request.params("playerid");
         	String gameidRequest = request.params("gameid");

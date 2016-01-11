@@ -21,6 +21,11 @@ public class Router {
 
         });
 
+        post("/boards/:gameid/players/:playerid/move", (request, response) -> {
+            service.move(request.params(":gameid"), request.params(":playerid"), Integer.parseInt(request.body()));
+            return "";
+        }, gson::toJson);
+
         post("/boards/:gameid/players/:playerid/roll", (request, response) -> {
             try {
                 Throw theThrow = gson.fromJson(request.body(), Throw.class);
@@ -58,6 +63,12 @@ public class Router {
 
         get("/boards/:gameid/players", (request, response) -> {
            return service.getBoard(request.params(":gameid")).getPlayers();
+        }, gson::toJson);
+
+        put("/boards/:gameid/places/:place", (request, response) -> {
+            Place place = gson.fromJson(request.body(), Place.class);
+            service.addPlace(request.params(":gameid"), request.params(":place"), place);
+            return true;
         }, gson::toJson);
 
         get("/boards/:gameid/places/:place", (request, response) -> {

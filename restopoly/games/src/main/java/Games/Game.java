@@ -1,6 +1,7 @@
 package Games;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Game {
@@ -95,4 +96,13 @@ public class Game {
         this.components = components;
     }
 
+
+    public void removePlayer(String playerid) {
+        for (Iterator<Player> playerIterator = players.iterator(); playerIterator.hasNext();) {
+            Player player = playerIterator.next();
+            if(player.getId().equals(playerid)) {
+                playerIterator.remove();
+            }
+        }
+    }
 }
