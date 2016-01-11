@@ -1,6 +1,7 @@
 package Boards;
 
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import spark.Spark;
 
 import com.google.gson.Gson;
@@ -37,11 +38,22 @@ public class Router {
         });
 
         put("/boards/:gameid/players/:playerid", (request, response) -> {
-            return service.addPlayer(request.params(":gameid"), request.params(":playerid"));
+            Player player = new Player(request.params(":playerid"));
+            return service.addPlayer(request.params(":gameid"), player);
         }, gson::toJson);
 
         get("/boards/:gameid/players/:playerid", (request, response) -> {
             return service.getPlayer(request.params(":gameid"), request.params(":playerid"));
+        }, gson::toJson);
+
+        post("/boards/:gameid/players", (request, response) -> {
+            Player player = gson.fromJson(request.body(), Player.class);
+
+            service.addPlayer(request.params(":gameid"), player);
+
+            response.status(201);
+            response.header("Location", player.getUri());
+            return true;
         }, gson::toJson);
 
         get("/boards/:gameid/players", (request, response) -> {

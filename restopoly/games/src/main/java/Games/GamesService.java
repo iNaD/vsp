@@ -57,11 +57,12 @@ public class GamesService {
         return new GamesList(games);
     }
 
-    public Player addPlayer(String gameid, String playerid, String name, String uri) {
+    public Player addPlayer(String gameid, Player player) throws UnirestException {
         Game game = getGame(gameid);
 
-        Player player = new Player(playerid, name, uri);
         game.addPlayer(player);
+
+        newBoardPlayer(gameid, player.getId());
 
         return player;
     }

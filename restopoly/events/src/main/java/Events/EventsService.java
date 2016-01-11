@@ -66,6 +66,7 @@ public class EventsService {
     }
 
     public Event addEvent(String gameid, Event event) {
+        event.setUri(serviceUri + "/" + event.getId());
         getEventslist(gameid).events.add(event);
 
         System.out.println("Searching for matching subscriptions.");

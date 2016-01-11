@@ -137,6 +137,7 @@ public class BrokerService {
     public Estate addEstate(String gameid, String placeid, Estate estate) {
         Broker broker = this.getBroker(gameid);
         if(!broker.hasEstate(placeid)) {
+            estate.setUri(service.getUri() + "/" + gameid + "/places/" + placeid);
             return broker.addEstate(placeid, estate);
         }
 

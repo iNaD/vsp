@@ -1,9 +1,6 @@
 package Boards;
 
-import Boards.Options;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -75,16 +72,16 @@ public class BoardsService {
 		return new RollResponse(player, board);
 	}
 
-	public Board addPlayer(String gameid, String playerid) {
+	public Board addPlayer(String gameid, Player player) {
 		Board board = getBoard(gameid);
-		Player player = new Player(playerid);
+        player.setUri(service.getUri() + "/" + gameid + "/players/" + player.getId());
 
 		board.addPlayer(player);
 
 		Field newField = board.updatePosition(player, 0);
 
 		try {
-			visit(gameid, newField.getPlace().getName(), playerid);
+			visit(gameid, newField.getPlace().getName(), player.getId());
 		} catch(UnirestException e) {
 			e.printStackTrace();
 		}

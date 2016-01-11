@@ -99,6 +99,7 @@ class Router {
 
                     service.addEvent(gameid, event);
                     response.status(201);
+                    response.header("Location", event.getUri());
                     return event;
                 } else {
                     response.status(400);

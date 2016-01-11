@@ -61,9 +61,29 @@ class Router {
         put("/games/:gameid/players/:playerid", (request, response) -> {
         	String playeridRequest = request.params("playerid");
         	String gameidRequest = request.params("gameid");
-            Player player = service.addPlayer(gameidRequest, playeridRequest, request.queryParams("name"), request.queryParams("uri"));
+            Player player = new Player(playeridRequest);
 
-            service.newBoardPlayer(gameidRequest, playeridRequest);
+            player.setName(request.queryParams("name"));
+            player.setUri(request.queryParams("uri"));
+
+            service.addPlayer(gameidRequest, player);
+
+            return player;
+        }, gson::toJson);
+
+        get("/games/:gameid/players/:playerid", (request, response) -> {
+            Player player = service.getGame(request.params(":gameid")).getPlayer(request.params(":playerid"));
+
+            return player;
+        }, gson::toJson);
+
+        post("/games/:gameid/players", (request, response) -> {
+            Player player = gson.fromJson(request.body(), Player.class);
+
+            service.addPlayer(request.params(":gameid"), player);
+
+            response.status(201);
+            response.header("Location", player.getUri());
 
             return player;
         }, gson::toJson);
@@ -82,6 +102,7 @@ class Router {
             String gameid = game.getGameid();
             //Unirest
             service.newBoard(gameid);
+            response.header("Location", game.getUri());
             return game;
         }, gson::toJson);
 

@@ -11,6 +11,15 @@ public class Estate {
     private List<Integer> rent = new ArrayList<>();
     private List<Integer> cost = new ArrayList<>();
     private Integer houses = 0;
+    private String uri = "";
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 
     public String getPlace() {
         return place;
