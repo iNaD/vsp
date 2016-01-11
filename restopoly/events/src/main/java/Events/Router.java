@@ -39,7 +39,9 @@ class Router {
                 subscription.setId(UUID.randomUUID().toString());
 
                 service.addSubscription(subscription);
-
+                
+                response.header("Location", subscription.getUri());
+                
                 return subscription;
             } else {
                 response.status(400);

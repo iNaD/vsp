@@ -98,6 +98,7 @@ public class EventsService {
     }
 
     public void addSubscription(Subscription subscription) {
+    	subscription.setUri(serviceUri+"/subscriptions/"+subscription.getId());
         this.subscriptions.add(subscription);
     }
 
