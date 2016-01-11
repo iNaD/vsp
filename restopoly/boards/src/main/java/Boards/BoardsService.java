@@ -29,18 +29,18 @@ public class BoardsService {
 
 	public Board addBoard(String gameid, Board board) {
 		boards.put(gameid, board);
-		try{
-			newBroker(gameid);
-			for (Field field : board.getFields()) {
-				String placeid=field.getPlace().getName();
-				grundstRegistr( gameid, placeid);
-			}
 
+		try {
+			newBroker(board);
+
+			for (Field field : board.getFields()) {
+				String placeid = field.getPlace().getName();
+				grundstRegistr(board, placeid);
 			}
+        }
 		catch(UnirestException e){
 			e.printStackTrace();
 		}
-
 
 		return board;
 	}
@@ -49,8 +49,12 @@ public class BoardsService {
 		return boards.get(gameid);
 	}
 
-	public Board newBoard(String gameid) {
-		return addBoard(gameid, new Board());
+	public Board newBoard(Game game) {
+        Board board = new Board();
+
+        board.setGame(game);
+
+		return addBoard(game.getGameid(), board);
 	}
 
 	public void deleteBoard(String gameid) {
@@ -64,7 +68,7 @@ public class BoardsService {
         Field newField = board.updatePosition(player, player.getPosition() + steps);
 
         try {
-            visit(gameid, newField.getPlace().getName(), playerid);
+            visit(board, newField.getPlace().getName(), playerid);
         } catch(UnirestException e) {
             e.printStackTrace();
         }
@@ -77,7 +81,7 @@ public class BoardsService {
 		Field newField = board.updatePosition(player, player.getPosition() + theThrow.sum());
 
 		try {
-			visit(gameid, newField.getPlace().getName(), playerid);
+			visit(board, newField.getPlace().getName(), playerid);
 		} catch(UnirestException e) {
 			e.printStackTrace();
 		}
@@ -94,7 +98,7 @@ public class BoardsService {
 		Field newField = board.updatePosition(player, 0);
 
 		try {
-			visit(gameid, newField.getPlace().getName(), player.getId());
+			visit(board, newField.getPlace().getName(), player.getId());
 		} catch(UnirestException e) {
 			e.printStackTrace();
 		}
@@ -155,11 +159,11 @@ public class BoardsService {
 	// /boards einen Broker pro Spiel erstellt
 	// put /brokers/{gameid}
 
-	public JSONObject newBroker(String gameid) throws UnirestException {
+	public JSONObject newBroker(Board board) throws UnirestException {
 		HttpResponse<JsonNode> response = Unirest
-				.put(Options.getSetting("brokerUri") + "/{gameid}")
+				.put(board.getGame().getComponents().broker)
 				.header("accept", "application/json")
-				.routeParam("gameid", gameid)
+                .body(board.getGame())
 				.asJson();
 
 		return response.getBody().getObject();
@@ -167,7 +171,7 @@ public class BoardsService {
 
 	// /boards die verfügbaren Grundstücke registriert mit
 	// put /brokers/{gameid}/places/{placeid}
-	public JSONObject grundstRegistr(String gameid, String placeid)
+	public JSONObject grundstRegistr(Board board, String placeid)
 			throws UnirestException {
         Estate estate = new Estate();
         estate.setPlace(placeid);
@@ -175,10 +179,9 @@ public class BoardsService {
         Gson gson = new Gson();
 
 		HttpResponse<JsonNode> response = Unirest
-				.put(Options.getSetting("brokerUri")
-						+ "/{gameid}/places/{placeid}")
+				.put(board.getGame().getComponents().broker + "/places/{placeid}")
 				.header("accept", "application/json")
-				.routeParam("gameid", gameid).routeParam("placeid", placeid)
+				.routeParam("placeid", placeid)
                 .body(gson.toJson(estate))
 				.asJson();
 		return response.getBody().getObject();
@@ -187,13 +190,12 @@ public class BoardsService {
 
 	// /boards bei /brokers Besuche durch Spieler anmeldet
 	// post /brokers/{gameid}/places/{placeid}/visit/{playerid}
-	public JSONObject visit(String gameid, String placeid, String playerid)
+	public JSONObject visit(Board board, String placeid, String playerid)
 			throws UnirestException {
 		HttpResponse<JsonNode> response = Unirest
-				.post(Options.getSetting("brokerUri")
-						+ "/{gameid}/places/{placeid}/visit/{playerid}")
+				.post(board.getGame().getComponents().broker + "/places/{placeid}/visit/{playerid}")
 				.header("accept", "application/json")
-				.routeParam("gameid", gameid).routeParam("placeid", placeid)
+				.routeParam("placeid", placeid)
                 .routeParam("playerid", playerid)
 				.asJson();
 		return response.getBody().getObject();

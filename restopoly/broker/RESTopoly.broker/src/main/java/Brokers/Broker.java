@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class Broker {
 
+    private Game game;
+
     private Map<String, Estate> estates = new HashMap<>();
 
     private Map<String, Player> players = new HashMap<>();
@@ -73,5 +75,13 @@ public class Broker {
         }
 
         return result;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
     }
 }

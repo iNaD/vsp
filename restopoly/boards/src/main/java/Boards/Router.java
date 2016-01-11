@@ -89,7 +89,8 @@ public class Router {
         });
 
         put("/boards/:gameid", (request, response) -> {
-            return service.newBoard(request.params(":gameid"));
+            Game game = gson.fromJson(request.body(), Game.class);
+            return service.newBoard(game);
         }, gson::toJson);
 
         get("/boards", (request, response) -> {

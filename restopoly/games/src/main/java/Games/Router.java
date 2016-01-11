@@ -103,12 +103,11 @@ class Router {
         }, gson::toJson);
 
         post("/games", (request, response) -> {
-            response.status(201);
             Game game = service.newGame();
-            String gameid = game.getGameid();
-            //Unirest
-            service.newBoard(gameid);
+
+            response.status(201);
             response.header("Location", game.getUri());
+
             return game;
         }, gson::toJson);
 
@@ -125,7 +124,6 @@ class Router {
         if(args.length > 0) {
             port = Integer.valueOf(args[0]);
         }
-
 
         Spark.port(port);
 

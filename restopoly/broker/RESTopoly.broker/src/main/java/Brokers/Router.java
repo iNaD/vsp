@@ -94,7 +94,8 @@ public class Router {
         }, gson::toJson);
 
         put("/brokers/:gameid", (request, response) -> {
-            return service.newBroker(request.params(":gameid"));
+            Game game = gson.fromJson(request.body(), Game.class);
+            return service.newBroker(game);
         }, gson::toJson);
 
         service.register();

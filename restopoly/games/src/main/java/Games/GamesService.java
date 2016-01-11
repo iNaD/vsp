@@ -33,11 +33,27 @@ public class GamesService {
         Game game = new Game();
         game.setGameid(UUID.randomUUID().toString());
         game.setUri(serviceUri + "/" + game.getGameid());
-        return addGame(game);
-    }
 
-    public Game addGame(Game game) {
+        game.getComponents().game = game.getUri();
+        game.getComponents().bank = game.getComponents().bank + "/" + game.getGameid();
+        game.getComponents().board = game.getComponents().board + "/" + game.getGameid();
+        game.getComponents().broker = game.getComponents().broker + "/" + game.getGameid();
+        game.getComponents().decks = game.getComponents().decks + "/" + game.getGameid();
+
+        try {
+            newBoard(game);
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            newBank(game);
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
         games.add(game);
+
         return game;
     }
 
@@ -62,7 +78,7 @@ public class GamesService {
 
         game.addPlayer(player);
 
-        newBoardPlayer(gameid, player.getId());
+        newBoardPlayer(game, player);
 
         return player;
     }
@@ -102,22 +118,33 @@ public class GamesService {
         }
     }
 
-	public JSONObject newBoard(String gameid) throws UnirestException{
-		 HttpResponse<JsonNode> response = Unirest.put(Options.getSetting("boardUri") + "/{gameid}")
-	                .header("accept", "application/json")
-	                .routeParam("gameid", gameid)
-	                .asJson();
+    public JSONObject newBank(Game game) throws UnirestException {
+        HttpResponse<JsonNode> response = Unirest.put(game.getComponents().bank)
+                .header("accept", "application/json")
+                .routeParam("gameid", game.getGameid())
+                .body(game)
+                .asJson();
 
-	        return response.getBody().getObject();
+        return response.getBody().getObject();
+    }
+
+	public JSONObject newBoard(Game game) throws UnirestException {
+        HttpResponse<JsonNode> response = Unirest.put(game.getComponents().board)
+            .header("accept", "application/json")
+            .routeParam("gameid", game.getGameid())
+            .body(game)
+            .asJson();
+
+        return response.getBody().getObject();
 	}
-	public JSONObject newBoardPlayer(String gameid, String playerid)throws UnirestException{
-		HttpResponse<JsonNode> response = Unirest.put(Options.getSetting("boardUri") + "/{gameid}/players/{playerid}")
-				.header("accept","application/json")
-				.routeParam("gameid", gameid)
-				.routeParam("playerid",playerid)
-				.asJson();
-		return response.getBody().getObject();
 
+	public JSONObject newBoardPlayer(Game game, Player player)throws UnirestException{
+		HttpResponse<JsonNode> response = Unirest.put(game.getComponents().board + "/players/{playerid}")
+            .header("accept","application/json")
+            .routeParam("gameid", game.getGameid())
+            .routeParam("playerid",player.getId())
+            .asJson();
+		return response.getBody().getObject();
 	}
 
 }

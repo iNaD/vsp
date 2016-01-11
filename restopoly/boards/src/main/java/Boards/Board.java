@@ -5,6 +5,8 @@ import java.util.*;
 
 public class Board {
 
+    private Game game;
+
     private List<Field> fields = new ArrayList<>();
 
     private List<Player> players = new ArrayList<>();
@@ -102,4 +104,11 @@ public class Board {
         return field;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
 }
