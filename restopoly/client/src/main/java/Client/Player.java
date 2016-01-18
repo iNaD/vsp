@@ -10,6 +10,7 @@ public class Player {
 
     public Player(String id) {
         this.id = id;
+        this.uri = "http://localhost/player";
     }
 
     public Player(String id, String name) {

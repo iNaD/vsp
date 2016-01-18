@@ -42,6 +42,7 @@ public class PlayerService {
 
         post("/player/turn", (request, response) -> {
             System.out.println("It's our turn");
+            System.out.println(request.body());
             return true;
         }, gson::toJson);
 
