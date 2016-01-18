@@ -7,7 +7,18 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
+
+import javax.net.ssl.SSLContext;
+
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 import static Client.Tools.readCli;
 
@@ -17,7 +28,21 @@ public class Client {
 
     protected static PlayerService playerService;
 
-    public static void main(String[] args) throws UnirestException {
+    public static void main(String[] args) throws UnirestException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        /**
+         * Make Unirest ignore certificates
+         */
+        SSLContext sslcontext = SSLContexts.custom()
+                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                .build();
+
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setSSLSocketFactory(sslsf)
+                .build();
+
+        Unirest.setHttpClient(httpclient);
+
         playerService = new PlayerService();
 
         System.out.println("Welcome to RESTopoly!");
@@ -126,6 +151,7 @@ public class Client {
         String decision = readCli("Start a new Game (y/n)[y]:");
 
         if(decision.length() == 0 || decision.equals("y")) {
+            ServiceSelector.menu();
             System.out.println("Creating a new game...");
             gameId = createGame().get("gameid").toString();
             System.out.println("New game created with id " + gameId + "!");

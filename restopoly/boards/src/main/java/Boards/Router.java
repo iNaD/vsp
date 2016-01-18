@@ -1,11 +1,21 @@
 package Boards;
 
 
-import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import spark.Spark;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
+import javax.net.ssl.SSLContext;
+
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 import static spark.Spark.*;
 
@@ -119,6 +129,27 @@ public class Router {
         }
 
         Spark.port(port);
+
+        /**
+         * Ignore certificate errors
+         */
+        SSLContext sslcontext = null;
+        try {
+            sslcontext = SSLContexts.custom()
+                    .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                    .build();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setSSLSocketFactory(sslsf)
+                .build();
 
         new Router();
     }

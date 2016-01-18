@@ -1,8 +1,17 @@
 package Events;
 
 import com.google.gson.Gson;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import spark.Spark;
 
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import static spark.Spark.*;
@@ -39,9 +48,9 @@ class Router {
                 subscription.setId(UUID.randomUUID().toString());
 
                 service.addSubscription(subscription);
-                
+
                 response.header("Location", subscription.getUri());
-                
+
                 return subscription;
             } else {
                 response.status(400);
@@ -140,6 +149,27 @@ class Router {
         }
 
         Spark.port(port);
+
+        /**
+         * Ignore certificate errors
+         */
+        SSLContext sslcontext = null;
+        try {
+            sslcontext = SSLContexts.custom()
+                    .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                    .build();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setSSLSocketFactory(sslsf)
+                .build();
 
         new Router();
     }
