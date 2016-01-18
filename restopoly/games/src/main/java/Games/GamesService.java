@@ -21,6 +21,9 @@ public class GamesService {
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
     private List<Game> games = new ArrayList<>();
+
+    private Gson gson = new Gson();
+
     public static String getServiceUri() {
         return serviceUri;
     }
@@ -105,8 +108,6 @@ public class GamesService {
     }
 
     public void register() {
-        Gson gson = new Gson();
-
         try {
             HttpResponse<JsonNode> response = Unirest
                     .post(serviceRegistrationUri)
@@ -123,7 +124,7 @@ public class GamesService {
     public JSONObject newBank(Game game) throws UnirestException {
         HttpResponse<JsonNode> response = Unirest.put(game.getComponents().bank)
                 .header("accept", "application/json")
-                .body(game)
+                .body(gson.toJson(game))
                 .asJson();
 
         return response.getBody().getObject();
@@ -143,7 +144,7 @@ public class GamesService {
 	public JSONObject newBoardPlayer(Game game, Player player)throws UnirestException{
 		HttpResponse<JsonNode> response = Unirest.put(game.getComponents().board + "/players/{playerid}")
             .header("accept","application/json")
-            .routeParam("playerid",player.getId())
+            .routeParam("playerid", player.getId())
             .asJson();
 		return response.getBody().getObject();
 	}
