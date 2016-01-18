@@ -32,6 +32,8 @@ public class BrokerService {
 	public Broker newBroker(Game game) {
 		Broker broker = new Broker();
         broker.setGame(game);
+        broker.setUri(service.getUri() + "/" + game.getGameid());
+
 		brokers.put(game.getGameid(), broker);
 
 		return broker;

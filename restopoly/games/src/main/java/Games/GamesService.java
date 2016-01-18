@@ -29,8 +29,10 @@ public class GamesService {
         GamesService.serviceUri = serviceUri;
     }
 
-    public Game newGame() {
-        Game game = new Game();
+    public Game newGame(String json) {
+        Gson gson = new Gson();
+        Game game = gson.fromJson(json, Game.class);
+
         game.setGameid(UUID.randomUUID().toString());
         game.setUri(serviceUri + "/" + game.getGameid());
 
@@ -121,7 +123,6 @@ public class GamesService {
     public JSONObject newBank(Game game) throws UnirestException {
         HttpResponse<JsonNode> response = Unirest.put(game.getComponents().bank)
                 .header("accept", "application/json")
-                .routeParam("gameid", game.getGameid())
                 .body(game)
                 .asJson();
 
@@ -129,10 +130,11 @@ public class GamesService {
     }
 
 	public JSONObject newBoard(Game game) throws UnirestException {
+        Gson gson = new Gson();
+
         HttpResponse<JsonNode> response = Unirest.put(game.getComponents().board)
             .header("accept", "application/json")
-            .routeParam("gameid", game.getGameid())
-            .body(game)
+            .body(gson.toJson(game))
             .asJson();
 
         return response.getBody().getObject();
@@ -141,7 +143,6 @@ public class GamesService {
 	public JSONObject newBoardPlayer(Game game, Player player)throws UnirestException{
 		HttpResponse<JsonNode> response = Unirest.put(game.getComponents().board + "/players/{playerid}")
             .header("accept","application/json")
-            .routeParam("gameid", game.getGameid())
             .routeParam("playerid",player.getId())
             .asJson();
 		return response.getBody().getObject();

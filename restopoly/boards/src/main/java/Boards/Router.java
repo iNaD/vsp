@@ -43,8 +43,11 @@ public class Router {
         });
 
         put("/boards/:gameid/players/:playerid", (request, response) -> {
-            Player player = new Player(request.params(":playerid"));
-            return service.addPlayer(request.params(":gameid"), player);
+            Player player = service.addPlayer(request.params(":gameid"), new Player(request.params(":playerid")));
+
+            response.header("Location", player.getUri());
+
+            return player;
         }, gson::toJson);
 
         get("/boards/:gameid/players/:playerid", (request, response) -> {
@@ -58,6 +61,7 @@ public class Router {
 
             response.status(201);
             response.header("Location", player.getUri());
+
             return true;
         }, gson::toJson);
 
@@ -67,8 +71,11 @@ public class Router {
 
         put("/boards/:gameid/places/:place", (request, response) -> {
             Place place = gson.fromJson(request.body(), Place.class);
-            service.addPlace(request.params(":gameid"), request.params(":place"), place);
-            return true;
+            Field field = service.addPlace(request.params(":gameid"), request.params(":place"), place);
+
+            response.header("Location", field.getUri());
+
+            return field;
         }, gson::toJson);
 
         get("/boards/:gameid/places/:place", (request, response) -> {
@@ -90,7 +97,11 @@ public class Router {
 
         put("/boards/:gameid", (request, response) -> {
             Game game = gson.fromJson(request.body(), Game.class);
-            return service.newBoard(game);
+            Board board = service.newBoard(game);
+
+            response.header("Location", board.getUri());
+
+            return board;
         }, gson::toJson);
 
         get("/boards", (request, response) -> {

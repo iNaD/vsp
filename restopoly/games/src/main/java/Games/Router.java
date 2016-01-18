@@ -74,6 +74,8 @@ class Router {
 
             service.addPlayer(gameidRequest, player);
 
+            response.header("Location", player.getUri());
+
             return player;
         }, gson::toJson);
 
@@ -102,8 +104,9 @@ class Router {
             return service.getGame(request.params(":gameid"));
         }, gson::toJson);
 
+
         post("/games", (request, response) -> {
-            Game game = service.newGame();
+            Game game = service.newGame(request.body());
 
             response.status(201);
             response.header("Location", game.getUri());

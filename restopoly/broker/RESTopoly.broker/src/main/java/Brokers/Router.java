@@ -66,7 +66,11 @@ public class Router {
                 return false;
             }
 
-            return service.addEstate(request.params(":gameid"), request.params(":placeid"), estate);
+            Estate savedEstate = service.addEstate(request.params(":gameid"), request.params(":placeid"), estate);
+
+            response.header("Location", savedEstate.getUri());
+
+            return savedEstate;
         }, gson::toJson);
 
         get("/brokers/:gameid/places/:placeid", (request, response) -> {
@@ -95,7 +99,11 @@ public class Router {
 
         put("/brokers/:gameid", (request, response) -> {
             Game game = gson.fromJson(request.body(), Game.class);
-            return service.newBroker(game);
+            Broker broker = service.newBroker(game);
+
+            response.header("Location", broker.getUri());
+
+            return broker;
         }, gson::toJson);
 
         service.register();

@@ -52,6 +52,8 @@ public class BoardsService {
 	public Board newBoard(Game game) {
         Board board = new Board();
 
+        board.setUri(service.getUri() + "/" + board.getGame().getGameid());
+
         board.setGame(game);
 
 		return addBoard(game.getGameid(), board);
@@ -89,7 +91,7 @@ public class BoardsService {
 		return new RollResponse(player, board);
 	}
 
-	public Board addPlayer(String gameid, Player player) {
+	public Player addPlayer(String gameid, Player player) {
 		Board board = getBoard(gameid);
         player.setUri(service.getUri() + "/" + gameid + "/players/" + player.getId());
 
@@ -102,7 +104,8 @@ public class BoardsService {
 		} catch(UnirestException e) {
 			e.printStackTrace();
 		}
-		return board;
+
+		return player;
 	}
 
 	public Player getPlayer(String gameid, String playerid) {
@@ -202,9 +205,13 @@ public class BoardsService {
 
 	}
 
-    public void addPlace(String gameid, String placeName, Place place) {
+    public Field addPlace(String gameid, String placeName, Place place) {
         place.setName(placeName);
         Field field = new Field(place);
+        field.setUri(service.getUri() + "/" + gameid + "/places/" + placeName);
+
         getBoard(gameid).getFields().add(field);
+
+        return field;
     }
 }

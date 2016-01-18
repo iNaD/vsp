@@ -7,6 +7,8 @@ import java.util.List;
 public class Field {
     private Place place;
 
+    private String uri;
+
     private List<String> players = new ArrayList<>();
 
     public Field(Place place) {
@@ -40,5 +42,13 @@ public class Field {
                 iterator.remove();
             }
         }
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

@@ -9,6 +9,8 @@ public class Broker {
 
     private Game game;
 
+    private String uri;
+
     private Map<String, Estate> estates = new HashMap<>();
 
     private Map<String, Player> players = new HashMap<>();
@@ -83,5 +85,13 @@ public class Broker {
 
     public void setGame(Game game) {
         this.game = game;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }
