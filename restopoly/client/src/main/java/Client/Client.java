@@ -7,12 +7,14 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.body.RequestBodyEntity;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.net.ssl.SSLContext;
@@ -20,12 +22,12 @@ import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static Client.Tools.readCli;
 
 public class Client {
-
-    protected static String gameId = null;
 
     protected static PlayerService playerService;
 
@@ -68,17 +70,17 @@ public class Client {
 
         gameMenu();
 
-        if(gameId != null && playerService.getPlayer() != null) {
-            System.out.println("Registering you (" + playerService.getPlayer().getId() + ") with the game " + gameId + ".");
-            System.out.println(addPlayerToGame(gameId, playerService.getPlayer()));
+        if(game != null && playerService.getPlayer() != null) {
+            System.out.println("Registering you (" + playerService.getPlayer().getId() + ") with the game " + game.getGameid() + ".");
+            System.out.println(addPlayerToGame());
 
             playerService.startRouter();
 
-            waitForReady();
+            sendReady();
 
             System.out.println("You (" + playerService.getPlayer().getId() + ") are ready to play!");
 
-            waitForQuit();
+            waitForAction();
 
             playerService.stopRouter();
         } else {
@@ -108,34 +110,76 @@ public class Client {
         return;
     }
 
-    private static void waitForQuit() {
-        String input = readCli("Press q if you want to quit:");
+    private static void waitForAction() {
+        String actions =
+            "You can do one of the following options:\n" +
+            "t Turn\n" +
+            "q Quit";
 
-        if(input.equals("q")) {
-            return;
-        } else {
-            System.out.println("Not q, still waiting for quit.");
-            waitForQuit();
+        String input = readCli(actions);
+        Boolean quit = false;
+
+        switch (input) {
+            case "t":
+                acquireTurn();
+                break;
+            case "q":
+                quit = true;
+                break;
+            default:
+        }
+
+        if(quit == false) {
+            waitForAction();
         }
     }
 
-    public static JSONObject createGame(Game game) throws UnirestException {
+    private static void acquireTurn() {
+        RequestBodyEntity request = Unirest.put(Options.getSetting("gamesUri") + "/players/turn")
+                .header("accept", "application/json")
+                .basicAuth(credentials.username, credentials.password)
+                .queryString("player", playerService.getPlayer().getId())
+                .body(gson.toJson(playerService.getPlayer()));
+
+        HttpResponse<JsonNode> response = null;
+        try {
+            response = request.asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            System.out.println("Failed to acquire Turn.");
+        }
+
+        if(response.getStatus() == 200 || response.getStatus() == 201) {
+            turnMenu();
+        } else {
+            System.out.println("Failed to acquire Turn.");
+        }
+    }
+
+    private static void turnMenu() {
+        // TODO: Turn
+    }
+
+
+    public static String createGame(Game game) throws UnirestException {
         RequestBodyEntity request = Unirest.post(Options.getSetting("gamesUri"))
                 .header("accept", "application/json")
                 .basicAuth(credentials.username, credentials.password)
                 .body(gson.toJson(game));
 
-        System.out.println(request.asString().getBody());
+        HttpResponse<String> response = request.asString();
 
-        return request.asJson().getBody().getObject();
+        System.out.println(response.getBody());
+
+        return response.getBody();
     }
 
-    public static JSONObject addPlayerToGame(String gameId, Player player) throws UnirestException {
+    public static JSONObject addPlayerToGame() throws UnirestException {
         HttpResponse<JsonNode> response = Unirest.put(Options.getSetting("gamesUri") + "/{gameid}/players/{playerid}")
                 .header("accept", "application/json")
                 .basicAuth(credentials.username, credentials.password)
-                .routeParam("gameid", gameId)
-                .routeParam("playerid", player.getId())
+                .routeParam("gameid", game.getGameid())
+                .routeParam("playerid", playerService.getPlayer().getId())
                 .asJson();
 
         return response.getBody().getObject();
@@ -152,25 +196,12 @@ public class Client {
         }
     }
 
-    public static void readGameId() {
-        String input = readCli("Ok, please enter the id of the game you want to join:");
-
-        if(input.length() > 0) {
-            gameId = input;
-        } else {
-            System.out.println("Invalid game id: " + input);
-            readGameId();
-        }
-    }
-
-    public static void waitForReady() {
-        readCli("Press Enter if you are ready to play:");
-
+    public static void sendReady() {
         try {
             HttpResponse<String> response = Unirest.put(Options.getSetting("gamesUri") + "/{gameid}/players/{playerid}/ready")
                     .header("accept", "application/json")
                     .basicAuth(credentials.username, credentials.password)
-                    .routeParam("gameid", gameId)
+                    .routeParam("gameid", game.getGameid())
                     .routeParam("playerid", playerService.getPlayer().getId())
                     .asString();
 
@@ -191,7 +222,7 @@ public class Client {
         if(decision.length() == 0 || decision.equals("y")) {
             SelectorMenu.menu(credentials);
             System.out.println("Creating a new game...");
-            game = new Game();
+            Game tmpGame = new Game();
             Components components = new Components();
 
             components.game = Options.getSetting("gamesUri");
@@ -202,18 +233,68 @@ public class Client {
             components.dice = Options.getSetting("diceUri");
             components.events = Options.getSetting("eventsUri");
 
-            game.setComponents(components);
+            tmpGame.setComponents(components);
 
             System.out.println("Using components: " + components);
 
-            gameId = createGame(game).getString("gameid");
+            game = gson.fromJson(createGame(tmpGame), Game.class);
 
-            System.out.println("New game created with id " + gameId + "!");
+            System.out.println("New game created with id " + game.getGameid() + "!");
         } else {
-            readGameId();
+            List<String> types = new ArrayList<>();
+            types.add("games");
+            SelectorMenu.menu(credentials, types);
+            joinGame();
         }
     }
-	//   Spieler Grundstücke kaufen können durch
+
+    private static void joinGame() {
+        GetRequest request = Unirest.get(Options.getSetting("gamesUri"))
+                .header("accept", "application/json")
+                .basicAuth(credentials.username, credentials.password);
+
+        try {
+            System.out.println(request.asString().getBody());
+
+            HttpResponse<JsonNode> response = request.asJson();
+
+            JSONArray games = response.getBody().getObject().getJSONArray("games");
+
+            List<String> uriList = new ArrayList<>();
+
+            Integer i = 0;
+            for (Integer length = games.length(); i < length; i++) {
+                String uri = games.getString(i);
+
+                uriList.add(uri);
+                System.out.println(i + ". " + uri);
+            }
+
+            String input = readCli("Ok, please enter the index of the game you want to join:");
+            String gameIndex = "";
+
+            if(input.length() > 0) {
+                gameIndex = input;
+
+                String uri = uriList.get(Integer.parseInt(gameIndex));
+
+                if(uri != null) {
+                    HttpResponse<String> gameResponse = Unirest.get(uri)
+                            .basicAuth(credentials.username, credentials.password)
+                            .asString();
+
+                    game = gson.fromJson(gameResponse.getBody(), Game.class);
+                }
+            } else {
+                System.out.println("Invalid index: " + input);
+                joinGame();
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //   Spieler Grundstücke kaufen können durch
 	//	post /brokers/{gameid}/places/{placeid}/owner
 	public JSONObject kauf(String gameid, String placeid)
 			throws UnirestException {

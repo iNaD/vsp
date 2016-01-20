@@ -12,7 +12,7 @@ public class EventsService {
 
     private static String serviceUri = "https://vs-docker.informatik.haw-hamburg.de/ports/11172/events";
 
-    private static Service service = new Service("Events", "Provides Event actions", "events", serviceUri);
+    private static Service service = new Service("Events Olga-Daniel", "Provides Event actions", "events", serviceUri);
 
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 

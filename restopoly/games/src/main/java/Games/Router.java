@@ -2,6 +2,7 @@ package Games;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.mashape.unirest.http.Unirest;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -160,6 +161,8 @@ class Router {
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setSSLSocketFactory(sslsf)
                 .build();
+
+        Unirest.setHttpClient(httpclient);
 
         new Router();
     }

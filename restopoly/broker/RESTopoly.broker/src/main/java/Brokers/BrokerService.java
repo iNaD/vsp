@@ -17,8 +17,10 @@ enum TransferAction {
 
 public class BrokerService {
 
-    private static Service service = new Service("Brokers",
-            "Provides Broker interaction", "brokers",
+    private static Service service = new Service(
+            "Brokers Olga-Daniel",
+            "Provides Broker interaction",
+            "brokers",
             "https://vs-docker.informatik.haw-hamburg.de/ports/11173/brokers");
 
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";

@@ -14,9 +14,11 @@ import org.json.JSONObject;
 
 public class GamesService {
 
-    private static String serviceUri = "https://vs-docker.informatik.haw-hamburg.de/ports/11170/games";//    19850
-
-    private static Service service = new Service("Games", "Provides Game actions", "games", serviceUri);
+    private static Service service = new Service(
+        "Games Olga-Daniel",
+        "Provides Game actions",
+        "games",
+        "https://vs-docker.informatik.haw-hamburg.de/ports/11170/games");
 
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
@@ -24,38 +26,31 @@ public class GamesService {
 
     private Gson gson = new Gson();
 
-    public static String getServiceUri() {
-        return serviceUri;
-    }
-
-    public static void setServiceUri(String serviceUri) {
-        GamesService.serviceUri = serviceUri;
-    }
-
     public Game newGame(String json) {
         Gson gson = new Gson();
         Game game = gson.fromJson(json, Game.class);
 
         game.setGameid(UUID.randomUUID().toString());
-        game.setUri(serviceUri + "/" + game.getGameid());
+        game.setUri(service.getUri() + "/" + game.getGameid());
 
         game.getComponents().game = game.getUri();
-        game.getComponents().bank = game.getComponents().bank + "/" + game.getGameid();
-        game.getComponents().board = game.getComponents().board + "/" + game.getGameid();
-        game.getComponents().broker = game.getComponents().broker + "/" + game.getGameid();
-        game.getComponents().decks = game.getComponents().decks + "/" + game.getGameid();
 
         try {
-            newBoard(game);
+            String boardUri = newBoard(game);
+            game.getComponents().board = boardUri;
         } catch (UnirestException e) {
             e.printStackTrace();
         }
 
         try {
-            newBank(game);
+            String bankUri = newBank(game);
+            game.getComponents().bank = bankUri;
         } catch (UnirestException e) {
             e.printStackTrace();
         }
+
+        game.getComponents().broker = null;
+        game.getComponents().decks = null;
 
         games.add(game);
 
@@ -121,16 +116,22 @@ public class GamesService {
         }
     }
 
-    public JSONObject newBank(Game game) throws UnirestException {
+    public String newBank(Game game) throws UnirestException {
         HttpResponse<JsonNode> response = Unirest.put(game.getComponents().bank)
                 .header("accept", "application/json")
                 .body(gson.toJson(game))
                 .asJson();
 
-        return response.getBody().getObject();
+        String location = null;
+
+        if(response.getStatus() == 200) {
+            location = response.getHeaders().getFirst("Location");
+        }
+
+        return location;
     }
 
-	public JSONObject newBoard(Game game) throws UnirestException {
+	public String newBoard(Game game) throws UnirestException {
         Gson gson = new Gson();
 
         HttpResponse<JsonNode> response = Unirest.put(game.getComponents().board)
@@ -138,7 +139,13 @@ public class GamesService {
             .body(gson.toJson(game))
             .asJson();
 
-        return response.getBody().getObject();
+        String location = null;
+
+        if(response.getStatus() == 200) {
+            location = response.getHeaders().getFirst("Location");
+        }
+
+        return location;
 	}
 
 	public JSONObject newBoardPlayer(Game game, Player player)throws UnirestException{

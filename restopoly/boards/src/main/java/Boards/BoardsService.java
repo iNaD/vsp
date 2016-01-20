@@ -15,8 +15,10 @@ import org.json.JSONObject;
 
 public class BoardsService {
 
-	private static Service service = new Service("Boards",
-			"Provides Board interaction", "boards",
+	private static Service service = new Service(
+            "Boards Olga-Daniel",
+			"Provides Board interaction",
+            "boards",
 			"https://vs-docker.informatik.haw-hamburg.de/ports/11171/boards");
 
 	private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
@@ -31,7 +33,8 @@ public class BoardsService {
 		boards.put(gameid, board);
 
 		try {
-			newBroker(board);
+			String brokerUri = newBroker(board);
+            board.getGame().getComponents().broker = brokerUri;
 
 			for (Field field : board.getFields()) {
 				String placeid = field.getPlace().getName();
@@ -161,15 +164,21 @@ public class BoardsService {
 
 	// /boards einen Broker pro Spiel erstellt
 	// put /brokers/{gameid}
-
-	public JSONObject newBroker(Board board) throws UnirestException {
+	public String newBroker(Board board) throws UnirestException {
 		HttpResponse<JsonNode> response = Unirest
-				.put(board.getGame().getComponents().broker)
+				.put(board.getGame().getComponents().broker + "/{gameid}")
 				.header("accept", "application/json")
+                .routeParam("gameid", board.getGame().getGameid())
                 .body(board.getGame())
 				.asJson();
 
-		return response.getBody().getObject();
+        String location = null;
+
+        if(response.getStatus() == 200) {
+            location = response.getHeaders().getFirst("Location");
+        }
+
+        return location;
 	}
 
 	// /boards die verfügbaren Grundstücke registriert mit

@@ -1,6 +1,7 @@
 package Boards;
 
 
+import com.mashape.unirest.http.Unirest;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -150,6 +151,8 @@ public class Router {
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setSSLSocketFactory(sslsf)
                 .build();
+
+        Unirest.setHttpClient(httpclient);
 
         new Router();
     }

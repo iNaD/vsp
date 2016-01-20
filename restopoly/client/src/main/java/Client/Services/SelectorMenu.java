@@ -4,7 +4,6 @@ import static Client.Tools.readCli;
 
 import Client.Credentials;
 import Client.Options;
-import Client.Tools;
 import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -20,15 +19,25 @@ public class SelectorMenu {
     private static Credentials credentials;
     private static Gson gson = new Gson();
 
-    public static void menu(Credentials credentials) {
+    public static void menu(Credentials credentials, List<String> types) {
         SelectorMenu.credentials = credentials;
-        selectServiceOfType("games");
-        selectServiceOfType("boards");
-        selectServiceOfType("brokers");
-        selectServiceOfType("events");
-        selectServiceOfType("banks");
-        selectServiceOfType("dice");
-        selectServiceOfType("decks");
+
+        for (String type : types) {
+            selectServiceOfType(type);
+        }
+    }
+
+    public static void menu(Credentials credentials) {
+        List<String> types = new ArrayList<>();
+        types.add("games");
+        types.add("boards");
+        types.add("brokers");
+        types.add("events");
+        types.add("banks");
+        types.add("dice");
+        types.add("decks");
+
+        menu(credentials, types);
     }
 
     private static void selectServiceOfType(String type) {
