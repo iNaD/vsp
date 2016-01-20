@@ -23,7 +23,7 @@ public class PlayerService {
     }
 
     protected void startRouter() {
-        Spark.port(4568);
+        Spark.port(4579);
 
         Gson gson = new Gson();
 

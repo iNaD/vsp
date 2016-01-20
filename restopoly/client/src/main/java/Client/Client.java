@@ -37,6 +37,8 @@ public class Client {
 
     protected static Gson gson = new Gson();
 
+    protected static Boolean yellowPage;
+
     public static void main(String[] args) throws UnirestException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         /**
          * Make Unirest ignore certificates
@@ -58,9 +60,15 @@ public class Client {
 
         Options.menu();
 
-        System.out.println("First we need your HAW Login Credentials:");
+        yellowPage = useYellowPageService();
 
-        readCredentials();
+        credentials = new Credentials("", "");
+
+        if(yellowPage) {
+            System.out.println("First we need your HAW Login Credentials:");
+
+            readCredentials();
+        }
 
         System.out.println("To start or join a game we need your player id.");
 
@@ -72,7 +80,9 @@ public class Client {
 
         if(game != null && playerService.getPlayer() != null) {
             System.out.println("Registering you (" + playerService.getPlayer().getId() + ") with the game " + game.getGameid() + ".");
-            System.out.println(addPlayerToGame());
+            Player player = gson.fromJson(addPlayerToGame(), Player.class);
+
+            playerService.setPlayer(player);
 
             playerService.startRouter();
 
@@ -86,6 +96,16 @@ public class Client {
         } else {
             System.out.println("Hmm... seems we are missing either the game or the player id. Please try again :(");
         }
+    }
+
+    private static Boolean useYellowPageService() {
+        String decision = readCli("Use yellow page service? (y/n)[n]:");
+
+        if(decision.length() == 0 || decision.equals("n")) {
+            return false;
+        }
+
+        return true;
     }
 
     private static void readCredentials() {
@@ -135,15 +155,15 @@ public class Client {
     }
 
     private static void acquireTurn() {
-        RequestBodyEntity request = Unirest.put(Options.getSetting("gamesUri") + "/players/turn")
+        RequestBodyEntity request = Unirest.put(game.getComponents().game + "/players/turn")
                 .header("accept", "application/json")
                 .basicAuth(credentials.username, credentials.password)
                 .queryString("player", playerService.getPlayer().getId())
                 .body(gson.toJson(playerService.getPlayer()));
 
-        HttpResponse<JsonNode> response = null;
+        HttpResponse<String> response = null;
         try {
-            response = request.asJson();
+            response = request.asString();
         } catch (UnirestException e) {
             e.printStackTrace();
             System.out.println("Failed to acquire Turn.");
@@ -174,15 +194,14 @@ public class Client {
         return response.getBody();
     }
 
-    public static JSONObject addPlayerToGame() throws UnirestException {
-        HttpResponse<JsonNode> response = Unirest.put(Options.getSetting("gamesUri") + "/{gameid}/players/{playerid}")
+    public static String addPlayerToGame() throws UnirestException {
+        HttpResponse<String> response = Unirest.post(game.get_players())
                 .header("accept", "application/json")
                 .basicAuth(credentials.username, credentials.password)
-                .routeParam("gameid", game.getGameid())
-                .routeParam("playerid", playerService.getPlayer().getId())
-                .asJson();
+                .body(gson.toJson(playerService.getPlayer()))
+                .asString();
 
-        return response.getBody().getObject();
+        return response.getBody();
     }
 
     public static void readPlayerId() {
@@ -198,11 +217,9 @@ public class Client {
 
     public static void sendReady() {
         try {
-            HttpResponse<String> response = Unirest.put(Options.getSetting("gamesUri") + "/{gameid}/players/{playerid}/ready")
+            HttpResponse<String> response = Unirest.put(playerService.getPlayer().get_ready())
                     .header("accept", "application/json")
                     .basicAuth(credentials.username, credentials.password)
-                    .routeParam("gameid", game.getGameid())
-                    .routeParam("playerid", playerService.getPlayer().getId())
                     .asString();
 
             if(response.getStatus() == 200) {
@@ -220,7 +237,10 @@ public class Client {
         String decision = readCli("Start a new Game (y/n)[y]:");
 
         if(decision.length() == 0 || decision.equals("y")) {
-            SelectorMenu.menu(credentials);
+            if(yellowPage) {
+                SelectorMenu.menu(credentials);
+            }
+
             System.out.println("Creating a new game...");
             Game tmpGame = new Game();
             Components components = new Components();
@@ -241,9 +261,13 @@ public class Client {
 
             System.out.println("New game created with id " + game.getGameid() + "!");
         } else {
-            List<String> types = new ArrayList<>();
-            types.add("games");
-            SelectorMenu.menu(credentials, types);
+            if(yellowPage) {
+                List<String> types = new ArrayList<>();
+                types.add("games");
+
+                SelectorMenu.menu(credentials, types);
+            }
+
             joinGame();
         }
     }
@@ -293,19 +317,5 @@ public class Client {
             e.printStackTrace();
         }
     }
-
-    //   Spieler Grundstücke kaufen können durch
-	//	post /brokers/{gameid}/places/{placeid}/owner
-	public JSONObject kauf(String gameid, String placeid)
-			throws UnirestException {
-		HttpResponse<JsonNode> response = Unirest
-				.post(Options.getSetting("brokerUri")
-						+ "/{gameid}/places/{placeid}/owner")
-				.header("accept", "application/json")
-				.routeParam("gameid", gameid).routeParam("playerid", placeid)
-				.asJson();
-		return response.getBody().getObject();
-
-	}
 
 }

@@ -9,8 +9,12 @@ public class Options {
     private static HashMap<String, String> settings = new HashMap<String, String>(){{
         put("servicesUri", "https://vs-docker.informatik.haw-hamburg.de/ports/8053");
         put("gamesUri", "http://localhost:4567/games");
+        put("banksUri", "http://localhost");
+        put("decksUri", "http://localhost");
+        put("diceUri", "http://localhost");
         put("boardsUri", "http://localhost:4568/boards");
         put("brokersUri", "http://localhost:4569/brokers");
+        put("eventsUri", "http://localhost:4570/events");
     }};
 
     public static String getSetting(String key) {

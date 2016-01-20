@@ -76,6 +76,9 @@ public class GamesService {
     public Player addPlayer(String gameid, Player player) throws UnirestException {
         Game game = getGame(gameid);
 
+        System.out.println(player.getId());
+        player.setUri(game.get_players() + "/" + player.getId());
+
         game.addPlayer(player);
 
         newBoardPlayer(game, player);

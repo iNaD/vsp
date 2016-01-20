@@ -5,6 +5,7 @@ public class Player {
     protected String id;
     protected String name;
     protected String uri;
+    protected String _ready;
     protected Integer position;
     protected boolean ready = false;
 
@@ -71,4 +72,11 @@ public class Player {
         this.position = position;
     }
 
+    public String get_ready() {
+        return _ready;
+    }
+
+    public void set_ready(String _ready) {
+        this._ready = _ready;
+    }
 }

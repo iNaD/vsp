@@ -4,6 +4,8 @@ public class Game {
 
     private String gameid;
 
+    private String _players;
+
     private Components components;
 
     private String uri;
@@ -30,5 +32,13 @@ public class Game {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String get_players() {
+        return _players;
+    }
+
+    public void set_players(String _players) {
+        this._players = _players;
     }
 }

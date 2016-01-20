@@ -8,6 +8,8 @@ public class Player {
 
     private Boolean ready = false;
 
+    private String _ready;
+
     public Player(String id) {
         this.id = id;
     }
@@ -53,6 +55,7 @@ public class Player {
 
     public void setUri(String uri) {
         this.uri = uri;
+        this._ready = this.uri + "/ready";
     }
 
     public boolean equals(Object o) {
@@ -79,4 +82,11 @@ public class Player {
         return true;
     }
 
+    public String get_ready() {
+        return _ready;
+    }
+
+    public void set_ready(String _ready) {
+        this._ready = _ready;
+    }
 }

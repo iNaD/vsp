@@ -16,6 +16,8 @@ public class Game {
 
     private String uri;
 
+    private String _players;
+
     private List<Player> players = new ArrayList<>();
 
     public String getGameid() {
@@ -86,6 +88,7 @@ public class Game {
 
     public void setUri(String uri) {
         this.uri = uri;
+        this._players = this.uri + "/players";
     }
 
     public Components getComponents() {
@@ -105,4 +108,13 @@ public class Game {
             }
         }
     }
+
+    public String get_players() {
+        return _players;
+    }
+
+    public void set_players(String _players) {
+        this._players = _players;
+    }
+
 }
