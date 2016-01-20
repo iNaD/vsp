@@ -29,4 +29,13 @@ public class Game {
     public void setUri(String uri) {
         this.uri = uri;
     }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "gameid='" + gameid + '\'' +
+                ", components=" + components +
+                ", uri='" + uri + '\'' +
+                '}';
+    }
 }

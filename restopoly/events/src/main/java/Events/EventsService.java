@@ -10,7 +10,7 @@ import java.util.*;
 
 public class EventsService {
 
-    private static String serviceUri = "https://vs-docker.informatik.haw-hamburg.de/ports/11172/events";
+    private static String serviceUri = "http://localhost:4570/events";
 
     private static Service service = new Service("Events Olga-Daniel", "Provides Event actions", "events", serviceUri);
 

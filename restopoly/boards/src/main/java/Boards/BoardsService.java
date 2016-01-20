@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mashape.unirest.request.body.RequestBodyEntity;
 import org.json.JSONObject;
 
 public class BoardsService {
@@ -19,7 +20,9 @@ public class BoardsService {
             "Boards Olga-Daniel",
 			"Provides Board interaction",
             "boards",
-			"https://vs-docker.informatik.haw-hamburg.de/ports/11171/boards");
+			"http://localhost:4568/boards");
+
+    private Gson gson = new Gson();
 
 	private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
@@ -54,6 +57,8 @@ public class BoardsService {
 
 	public Board newBoard(Game game) {
         Board board = new Board();
+
+        board.setGame(game);
 
         board.setUri(service.getUri() + "/" + board.getGame().getGameid());
 
@@ -117,8 +122,6 @@ public class BoardsService {
 	}
 
 	public void register() {
-		Gson gson = new Gson();
-
 		try {
 			HttpResponse<JsonNode> response = Unirest
 					.post(serviceRegistrationUri)
@@ -169,7 +172,7 @@ public class BoardsService {
 				.put(board.getGame().getComponents().broker + "/{gameid}")
 				.header("accept", "application/json")
                 .routeParam("gameid", board.getGame().getGameid())
-                .body(board.getGame())
+                .body(gson.toJson(board.getGame()))
 				.asJson();
 
         String location = null;
@@ -177,6 +180,8 @@ public class BoardsService {
         if(response.getStatus() == 200) {
             location = response.getHeaders().getFirst("Location");
         }
+
+        System.out.println("broker uri: " + location);
 
         return location;
 	}
@@ -188,15 +193,15 @@ public class BoardsService {
         Estate estate = new Estate();
         estate.setPlace(placeid);
 
-        Gson gson = new Gson();
+        RequestBodyEntity request = Unirest
+                .put(board.getGame().getComponents().broker + "/places/{placeid}")
+                .header("accept", "application/json")
+                .routeParam("placeid", placeid)
+                .body(gson.toJson(estate));
 
-		HttpResponse<JsonNode> response = Unirest
-				.put(board.getGame().getComponents().broker + "/places/{placeid}")
-				.header("accept", "application/json")
-				.routeParam("placeid", placeid)
-                .body(gson.toJson(estate))
-				.asJson();
-		return response.getBody().getObject();
+        System.out.println(request.asString().getBody());
+
+		return request.asJson().getBody().getObject();
 
 	}
 

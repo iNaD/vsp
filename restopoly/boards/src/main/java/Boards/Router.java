@@ -108,6 +108,29 @@ public class Router {
 
         put("/boards/:gameid", (request, response) -> {
             Game game = gson.fromJson(request.body(), Game.class);
+
+            if(game == null) {
+                System.out.println("Invalid game" + request.body());
+                response.status(400);
+                return "";
+            }
+
+            Board board = service.newBoard(game);
+
+            response.header("Location", board.getUri());
+
+            return board;
+        }, gson::toJson);
+
+        post("/boards", (request, response) -> {
+            Game game = gson.fromJson(request.body(), Game.class);
+
+            if(game == null) {
+                System.out.println("Invalid game" + request.body());
+                response.status(400);
+                return "";
+            }
+
             Board board = service.newBoard(game);
 
             response.header("Location", board.getUri());

@@ -18,7 +18,7 @@ public class GamesService {
         "Games Olga-Daniel",
         "Provides Game actions",
         "games",
-        "https://vs-docker.informatik.haw-hamburg.de/ports/11170/games");
+        "http://localhost:4567/games");
 
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
@@ -117,16 +117,18 @@ public class GamesService {
     }
 
     public String newBank(Game game) throws UnirestException {
-        HttpResponse<JsonNode> response = Unirest.put(game.getComponents().bank)
+        HttpResponse<String> response = Unirest.put(game.getComponents().bank)
                 .header("accept", "application/json")
                 .body(gson.toJson(game))
-                .asJson();
+                .asString();
 
         String location = null;
 
         if(response.getStatus() == 200) {
             location = response.getHeaders().getFirst("Location");
         }
+
+        System.out.println("bank uri:" + location);
 
         return location;
     }
@@ -134,16 +136,18 @@ public class GamesService {
 	public String newBoard(Game game) throws UnirestException {
         Gson gson = new Gson();
 
-        HttpResponse<JsonNode> response = Unirest.put(game.getComponents().board)
-            .header("accept", "application/json")
-            .body(gson.toJson(game))
-            .asJson();
+        HttpResponse<String> response = Unirest.post(game.getComponents().board)
+                .header("accept", "application/json")
+                .body(gson.toJson(game))
+                .asString();
 
         String location = null;
 
         if(response.getStatus() == 200) {
             location = response.getHeaders().getFirst("Location");
         }
+
+        System.out.println("board uri:" + location);
 
         return location;
 	}
@@ -153,6 +157,7 @@ public class GamesService {
             .header("accept","application/json")
             .routeParam("playerid", player.getId())
             .asJson();
+
 		return response.getBody().getObject();
 	}
 

@@ -21,7 +21,7 @@ public class BrokerService {
             "Brokers Olga-Daniel",
             "Provides Broker interaction",
             "brokers",
-            "https://vs-docker.informatik.haw-hamburg.de/ports/11173/brokers");
+            "http://localhost:4569/brokers");
 
     private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
