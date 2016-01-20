@@ -155,7 +155,7 @@ public class Client {
     }
 
     private static void acquireTurn() {
-        RequestBodyEntity request = Unirest.put(game.getComponents().game + "/players/turn")
+        RequestBodyEntity request = Unirest.put(game.get_players() + "/turn")
                 .header("accept", "application/json")
                 .basicAuth(credentials.username, credentials.password)
                 .queryString("player", playerService.getPlayer().getId())

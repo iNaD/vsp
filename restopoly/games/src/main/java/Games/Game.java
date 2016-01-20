@@ -18,7 +18,11 @@ public class Game {
 
     private String _players;
 
-    private List<Player> players = new ArrayList<>();
+    private List<Player> players;
+
+    public Game() {
+        this.players = new ArrayList<>();
+    }
 
     public String getGameid() {
         return gameid;
