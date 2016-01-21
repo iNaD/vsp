@@ -207,15 +207,15 @@ public class BoardsService {
 
 	// /boards bei /brokers Besuche durch Spieler anmeldet
 	// post /brokers/{gameid}/places/{placeid}/visit/{playerid}
-	public JSONObject visit(Board board, String placeid, String playerid)
+	public String visit(Board board, String placeid, String playerid)
 			throws UnirestException {
-		HttpResponse<JsonNode> response = Unirest
-				.post(board.getGame().getComponents().broker + "/places/{placeid}/visit/{playerid}")
-				.header("accept", "application/json")
-				.routeParam("placeid", placeid)
+        HttpResponse<String> response = Unirest
+                .post(board.getGame().getComponents().broker + "/places/{placeid}/visit/{playerid}")
+                .header("accept", "application/json")
+                .routeParam("placeid", placeid)
                 .routeParam("playerid", playerid)
-				.asJson();
-		return response.getBody().getObject();
+                .asString();
+		return response.getBody();
 
 	}
 

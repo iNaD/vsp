@@ -8,6 +8,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import com.mashape.unirest.request.GetRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import com.mashape.unirest.request.body.RequestBodyEntity;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
@@ -164,6 +165,7 @@ public class Client {
         HttpResponse<String> response = null;
         try {
             response = request.asString();
+            System.out.println(response.getBody());
         } catch (UnirestException e) {
             e.printStackTrace();
             System.out.println("Failed to acquire Turn.");
@@ -177,7 +179,36 @@ public class Client {
     }
 
     private static void turnMenu() {
-        // TODO: Turn
+        String actions =
+            "1. Roll\n" +
+            "2. End Turn";
+        System.out.println("It's our turn! Select an action:");
+        System.out.println(actions);
+
+        String selection = readCli("Action:");
+
+        if(selection.equals("1")) {
+            doRoll();
+        } else {
+            endTurn();
+        }
+    }
+
+    private static void endTurn() {
+        HttpRequestWithBody request = Unirest.delete(game.get_players() + "/turn")
+                .header("accept", "application/json")
+                .basicAuth(credentials.username, credentials.password);
+
+        try {
+            System.out.println(request.asString().getBody());
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void doRoll() {
+        System.out.println(game.getComponents().board);
+        endTurn();
     }
 
 
